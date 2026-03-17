@@ -1,5 +1,27 @@
 #include "top-it-vector.hpp"
+#include <iostream>
+#include <iomanip>
+#include <utility>
 
+bool testEmptyVector()
+{
+  return false;
+}
 
 int main()
-{}
+{
+  using test_t = std::pair< const char *, bool(*)() > ;
+  test_t tests[] = {
+    { "Empty vector", testEmptyVector}
+  };
+  const size_t count = sizeof(tests) / sizeof(test_t);
+  bool pass = true;
+  for (size_t i = 0; i < count; ++i)
+  {
+    std::cout << std::boolalpha;
+    bool res = tests[i].second();
+    std::cout << tests[i].first << ": " << tests[i].second() << '\n';
+    pass = pass && res;
+  }
+  std::cout << "RESULT: " << pass << '\n';
+}
