@@ -9,7 +9,7 @@ bool testEmptyVector()
   return v.isEmpty();
 }
 
-bool testSizeAndCapacityOfVector()
+bool testSizeOfVector()
 {
   topit::Vector< int > v;
   v.pushBack(1);
@@ -17,22 +17,41 @@ bool testSizeAndCapacityOfVector()
   v.pushBack(3);
   v.pushBack(4);
   v.pushBack(5);
-  return v.getSize() == 5 && v.getCapacity() == 5;
+  return v.getSize() == 5;
 }
 
-bool testPushAndPopOfVector()
+bool testCapacityOfVector()
 {
   topit::Vector< int > v;
-  bool res;
+  bool res = v.getCapacity() == 0;
   v.pushBack(1);
   v.pushBack(2);
   v.pushBack(3);
   v.pushBack(4);
   v.pushBack(5);
-  res = v.getCapacity() == 5 && v.getSize() == 5;
+  res = res && v.getCapacity() == 8;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.pushBack(4);
+  v.pushBack(5);
+  res = res && v.getCapacity() == 16;
+  return res;
+}
+
+bool testPushAndPopValue()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+
+  bool res = v.getSize() == 3;
+
   v.popBack();
   v.popBack();
-  res = res && v.getCapacity() == 3 && v.getSize() == 3;
+
+  res = res && v.getSize() == 1;
   return res;
 }
 
@@ -41,8 +60,9 @@ int main()
   using test_t = std::pair< const char *, bool(*)() > ;
   test_t tests[] = {
     {"Empty vector", testEmptyVector},
-    {"Size of vector", testSizeAndCapacityOfVector},
-    {"Capacity of vector", testPushAndPopOfVector}
+    {"Size of vector", testSizeOfVector},
+    {"Capacity of vector", testCapacityOfVector},
+    {"Push and Pop value", testPushAndPopValue}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   bool pass = true;
