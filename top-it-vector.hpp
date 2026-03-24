@@ -11,9 +11,11 @@ namespace topit
 
     Vector();
     Vector(const Vector&);
-    Vector(Vector&&);
+    Vector(Vector&&) noexcept;
+    Vector(size_t size, const T& init);
+
     Vector& operator=(const Vector&);
-    Vector& operator=(Vector&&);
+    Vector& operator=(Vector&&) noexcept;
 
     T& operator[](size_t id) noexcept;
     const T& operator[](size_t id) const noexcept;
@@ -29,9 +31,11 @@ namespace topit
     void popBack();
     void insert(size_t i, const T& v);
     void erase(size_t i);
+    void swap(Vector< T >& rhs) noexcept;
 
   private:
     void extend(T** oldData, size_t& k, const T& newT);
+    explicit Vector(size_t size);
     T* data_;
     size_t size_, capacity_;
   };
@@ -95,25 +99,71 @@ const T& topit::Vector< T >::operator[](size_t id) const noexcept
   return data_[id];
 }
 
+template< class T >
+void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
+{
+  std::swap(data_, rhs.data_);
+  std::swap(size_, rhs.size_);
+  std::swap(capacity_, rhs.capacity_);
+}
+template< class T >
+topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
+{
+  if (this == std::addressof(rhs))
+  {
+    return *this;
+  }
+  Vector< T > cpy(rhs);
+  swap(this, rhs);
+  return *this;
+}
+
+template< class T >
+topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
+{
+  if (this == std::addressof(rhs))
+  {
+    return *this;
+  }
+  Vector< T >cpy(std::move(rhs));
+  swap(cpy);
+  return *this;
+}
 
 template< class T >
 topit::Vector< T >::Vector(const Vector& rhs):
-  data_(rhs.getSize() ? new T[rhs.getSize()] : nullptr),
-  size_(rhs.getSize()),
-  capacity_(rhs.getSize())
+  Vector(rhs.getSize())
 {
   for (size_t i = 0; i < rhs.getSize(); ++i)
   {
-    try
-    {
-      data_[i] = rhs[i];
-    }
-    catch(...)
-    {
-      delete[] data_;
-      throw;
-    }
+    data_[i] = rhs[i];
   }
+}
+
+template< class T >
+topit::Vector< T >::Vector(size_t size):
+  data_(size ? new T[size]: nullptr),
+  size_(size),
+  capacity_(size_)
+{}
+
+template< class T >
+topit::Vector< T >::Vector(size_t size, const T& init):
+  Vector(size)
+{
+  for (size_t i = 0; i < size; ++i)
+  {
+    data_[i] = init;
+  }
+}
+
+template< class T >
+topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
+  data_(rhs.data_),
+  size_(rhs.size_),
+  capacity_(rhs.capacity_)
+{
+  rhs.data_ = nullptr;
 }
 
 template< class T >
@@ -124,13 +174,14 @@ bool topit::operator==(const Vector< T >& rhs, const Vector< T >& lhs)
   return isEqual;
 }
 
-
 template< class T >
 T& topit::Vector< T >::at(size_t id)
 {
   const Vector< T >* cthis = this;
   return const_cast< T& >(cthis->at(id));
 }
+
+
 
 template< class T >
 const T& topit::Vector< T >::at(size_t id) const
