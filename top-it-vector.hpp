@@ -81,7 +81,8 @@ void topit::Vector< T >::extend(T** oldData, size_t& k, const T& newT)
 template< class T >
 T& topit::Vector< T >::operator[](size_t id) noexcept
 {
-  return data_[id];
+  const Vector< T >* cthis = this;
+  return const_cast< T& >((*cthis)[id]);
 }
 
 
@@ -103,7 +104,7 @@ const T& topit::Vector< T >::at(size_t id) const
 {
   if (id < getSize())
   {
-    return data_[id];
+    return (*this)[id];
   }
   throw std::out_of_range("bad id");
 }
