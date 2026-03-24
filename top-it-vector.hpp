@@ -35,6 +35,9 @@ namespace topit
     T* data_;
     size_t size_, capacity_;
   };
+  template< class T >
+  bool operator==(const Vector< T >& rhs, const Vector< T >& lhs);
+
 }
 
 template< class T >
@@ -91,6 +94,22 @@ const T& topit::Vector< T >::operator[](size_t id) const noexcept
 {
   return data_[id];
 }
+
+
+template< class T >
+topit::Vector< T >::Vector(const Vector&)
+{
+
+}
+
+template< class T >
+bool topit::operator==(const Vector< T >& rhs, const Vector< T >& lhs)
+{
+  bool isEqual = lhs.getSize() == rhs.getSize();
+  for (size_t i = 0; (i < lhs.getSize()) && (isEqual = isEqual && lhs[i] == rhs[i]); ++i);
+  return isEqual;
+}
+
 
 template< class T >
 T& topit::Vector< T >::at(size_t id)
