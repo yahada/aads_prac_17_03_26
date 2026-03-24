@@ -1,6 +1,7 @@
 #ifndef TOP_IT_VECTOR_HPP
 #define TOP_IT_VECTOR_HPP
 #include <cstddef>
+#include <iostream>
 namespace topit
 {
   template< class T >
@@ -14,6 +15,11 @@ namespace topit
     Vector& operator=(const Vector&);
     Vector& operator=(Vector&&);
 
+    T& operator[](size_t id) noexcept;
+    const T& operator[](size_t id) const noexcept;
+
+    T& at(size_t it);
+    const T& at(size_t it) const;
 
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
@@ -70,6 +76,26 @@ void topit::Vector< T >::extend(T** oldData, size_t& k, const T& newT)
 
   delete[] *oldData;
   *oldData = newData;
+}
+
+template< class T >
+T& topit::Vector< T >::at(size_t id)
+{
+  if (id < getSize())
+  {
+    return data_[id];
+  }
+  throw std::out_of_range("bad id");
+}
+
+template< class T >
+const T& topit::Vector< T >::at(size_t id) const
+{
+  if (id < getSize())
+  {
+    return data_[id];
+  }
+  throw std::out_of_range("bad id");
 }
 
 template< class T >
