@@ -97,9 +97,23 @@ const T& topit::Vector< T >::operator[](size_t id) const noexcept
 
 
 template< class T >
-topit::Vector< T >::Vector(const Vector&)
+topit::Vector< T >::Vector(const Vector& rhs):
+  data_(rhs.getSize() ? new T[rhs.getSize()] : nullptr),
+  size_(rhs.getSize()),
+  capacity_(rhs.getSize())
 {
-
+  for (size_t i = 0; i < rhs.getSize(); ++i)
+  {
+    try
+    {
+      data_[i] = rhs[i];
+    }
+    catch(...)
+    {
+      delete[] data_;
+      throw;
+    }
+  }
 }
 
 template< class T >
