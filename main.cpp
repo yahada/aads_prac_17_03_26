@@ -32,8 +32,7 @@ bool testCapacityOfVector()
   v.pushBack(3);
   v.pushBack(4);
   v.pushBack(5);
-  res = res && v.getCapacity() == 16;
-  return res;
+  return res && v.getCapacity() == 16;;
 }
 
 bool testPushBack()
@@ -42,8 +41,7 @@ bool testPushBack()
   v.pushBack(1);
   bool res = v[0] == 1;
   v.pushBack(2);
-  res = res && v[1] == 2;
-  return res;
+  return res && v[1] == 2;
 }
 
 bool testPopBack()
