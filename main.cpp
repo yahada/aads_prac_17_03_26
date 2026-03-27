@@ -14,10 +14,7 @@ bool testSizeOfVector()
   topit::Vector< int > v;
   v.pushBack(1);
   v.pushBack(2);
-  v.pushBack(3);
-  v.pushBack(4);
-  v.pushBack(5);
-  return v.getSize() == 5;
+  return v.getSize() == 2;
 }
 
 bool testCapacityOfVector()
@@ -39,20 +36,23 @@ bool testCapacityOfVector()
   return res;
 }
 
-bool testPushAndPopValue()
+bool testPushBack()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  bool res = v[0] == 1;
+  v.pushBack(2);
+  res = res && v[1] == 2;
+  return res;
+}
+
+bool testPopBack()
 {
   topit::Vector< int > v;
   v.pushBack(1);
   v.pushBack(2);
-  v.pushBack(3);
-
-  bool res = v.getSize() == 3;
-
   v.popBack();
-  v.popBack();
-
-  res = res && v.getSize() == 1;
-  return res;
+  return v[0] == 1 && v.getSize() == 1 && v.getCapacity() == 8;
 }
 
 bool testElementInboundAccess()
@@ -135,6 +135,90 @@ bool testCopyConstructorforNonEmpty()
   return v == yav;
 }
 
+bool testCopyOperatorforEmpty()
+{
+  topit::Vector< int > v;
+  topit::Vector< int > yav;
+  yav = v;
+  return v == yav;
+}
+
+bool testCopyOperatorforNonEmpty()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  topit::Vector< int > yav;
+  yav = v;
+  return v == yav;
+}
+
+bool testMoveConstructorforEmpty()
+{
+  topit::Vector< int > v;
+  topit::Vector< int > copyV(v);
+  topit::Vector< int > yav(std::move(v));
+  try
+  {
+    v.at(0);
+    return false;
+  } catch(const std::out_of_range&)
+  {
+    return yav == copyV;
+  }
+}
+
+bool testMoveConstructorforNonEmpty()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  topit::Vector< int > copyV(v);
+  topit::Vector< int > yav(std::move(v));
+  try
+  {
+    v.at(0);
+    return false;
+  } catch(const std::out_of_range&)
+  {
+    return yav == copyV;
+  }
+}
+
+
+bool testMoveOperatorforEmpty()
+{
+  topit::Vector< int > v;
+  topit::Vector< int > copyV(v);
+  topit::Vector< int > yav;
+  yav = std::move(v);
+  try
+  {
+    v.at(0);
+    return false;
+  } catch(const std::out_of_range&)
+  {
+    return yav == copyV;
+  }
+}
+
+bool testMoveOperatorforNonEmpty()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  topit::Vector< int > copyV(v);
+  topit::Vector< int > yav;
+  yav = std::move(v);
+  try
+  {
+    v.at(0);
+    return false;
+  } catch(const std::out_of_range&)
+  {
+    return yav == copyV;
+  }
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() > ;
@@ -142,24 +226,42 @@ int main()
     { "Empty vector", testEmptyVector },
     { "Size of vector", testSizeOfVector },
     { "Capacity of vector", testCapacityOfVector },
-    { "Push and Pop value", testPushAndPopValue },
+    { "Push value to the back", testPushBack },
+    { "Pop value from back", testPopBack },
     { "Inbound access", testElementInboundAccess },
     { "Out of bound access", testElementOutOfBoundAccess },
     { "Inbound const access", testElementInboundConstAccess },
     { "Out of bound const access", testElementOutOfBoundConstAccess },
-    { "Copy empty constructor", testCopyConstructorforEmpty },
-    { "Copy for non empty constructor", testCopyConstructorforNonEmpty },
+    { "Copy constructor for empty vector", testCopyConstructorforEmpty },
+    { "Copy constructor for non empty vector", testCopyConstructorforNonEmpty },
+    { "Copy operator for empty vector", testCopyOperatorforEmpty },
+    { "Copy operator for non empty vector", testCopyOperatorforNonEmpty },
+    { "Move constructor for empty vector", testMoveConstructorforEmpty },
+    { "Move constructor for non empty vector", testMoveConstructorforNonEmpty },
+    { "Move operator for empty vector", testMoveOperatorforEmpty },
+    { "Move operator for non empty vector", testMoveOperatorforNonEmpty },
   };
+  std::cout << "TESTS\n";
   const size_t count = sizeof(tests) / sizeof(test_t);
   bool pass = true;
+  size_t countFailedTests = 0;
+  size_t countSuccessTests = 0;
   for (size_t i = 0; i < count; ++i)
   {
     std::cout << std::boolalpha;
     bool res = tests[i].second();
-    std::cout << tests[i].first << ": " << tests[i].second() << '\n';
+    if (res)
+    {
+      countSuccessTests++;
+    } else
+    {
+    std::cout << i + 1 << ". " << tests[i].first << ": " << tests[i].second() << '\n';
+      countFailedTests++;
+    }
     pass = pass && res;
   }
+
+  std::cout << "Successful tests: " << countSuccessTests << '\n';
+  std::cout << "Failed tests: " << countFailedTests << '\n';
   std::cout << "RESULT: " << pass << '\n';
-  //подсчет пройденных/не пройденных тестов
-  //выводить только не прошедшие тесты
 }

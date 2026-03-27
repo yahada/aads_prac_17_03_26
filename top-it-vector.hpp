@@ -41,8 +41,111 @@ namespace topit
   };
   template< class T >
   bool operator==(const Vector< T >& rhs, const Vector< T >& lhs);
-
 }
+
+
+template< class T >
+topit::Vector< T >::Vector():
+  data_(nullptr),
+  size_(0),
+  capacity_(0)
+{}
+
+template< class T >
+topit::Vector< T >::Vector(const Vector& rhs):
+  Vector(rhs.getSize())
+{
+  for (size_t i = 0; i < rhs.getSize(); ++i)
+  {
+    data_[i] = rhs[i];
+  }
+}
+
+template< class T >
+topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
+  data_(rhs.data_),
+  size_(rhs.size_),
+  capacity_(rhs.capacity_)
+{
+  rhs.data_ = nullptr;
+  rhs.size_ = 0;
+}
+
+template< class T >
+topit::Vector< T >::Vector(size_t size, const T& init):
+  Vector(size)
+{
+  for (size_t i = 0; i < size; ++i)
+  {
+    data_[i] = init;
+  }
+}
+
+template< class T >
+topit::Vector< T >::Vector(size_t size):
+  data_(size ? new T[size]: nullptr),
+  size_(size),
+  capacity_(size_)
+{}
+
+template< class T >
+topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
+{
+  if (this == std::addressof(rhs))
+  {
+    return *this;
+  }
+
+  Vector< T > cpy(rhs);
+  swap(cpy);
+  return *this;
+}
+
+template< class T >
+topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
+{
+  if (this == std::addressof(rhs))
+  {
+    return *this;
+  }
+
+  Vector< T >cpy(std::move(rhs));
+  swap(cpy);
+  return *this;
+}
+
+template< class T >
+T& topit::Vector< T >::operator[](size_t id) noexcept
+{
+  const Vector< T >* cthis = this;
+  return const_cast< T& >((*cthis)[id]);
+}
+
+
+template< class T >
+const T& topit::Vector< T >::operator[](size_t id) const noexcept
+{
+  return data_[id];
+}
+
+
+template< class T >
+T& topit::Vector< T >::at(size_t id)
+{
+  const Vector< T >* cthis = this;
+  return const_cast< T& >(cthis->at(id));
+}
+
+template< class T >
+const T& topit::Vector< T >::at(size_t id) const
+{
+  if (id < getSize())
+  {
+    return (*this)[id];
+  }
+  throw std::out_of_range("bad id");
+}
+
 
 template< class T >
 bool topit::Vector< T >::isEmpty() const noexcept
@@ -60,137 +163,6 @@ template< class T >
 size_t topit::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
-}
-
-template< class T >
-void topit::Vector< T >::extend(T** oldData, size_t& k, const T& newT)
-{
-  T* newData = nullptr;
-  try
-  {
-    newData = new T[k * 2];
-    for (size_t i = 0; i < k; ++i)
-    {
-      newData[i] = (*oldData)[i];
-    }
-    newData[k++] = newT;
-  }
-  catch(...)
-  {
-    delete[] newData;
-    throw;
-  }
-
-  delete[] *oldData;
-  *oldData = newData;
-}
-
-template< class T >
-T& topit::Vector< T >::operator[](size_t id) noexcept
-{
-  const Vector< T >* cthis = this;
-  return const_cast< T& >((*cthis)[id]);
-}
-
-
-template< class T >
-const T& topit::Vector< T >::operator[](size_t id) const noexcept
-{
-  return data_[id];
-}
-
-template< class T >
-void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
-{
-  std::swap(data_, rhs.data_);
-  std::swap(size_, rhs.size_);
-  std::swap(capacity_, rhs.capacity_);
-}
-template< class T >
-topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
-{
-  if (this == std::addressof(rhs))
-  {
-    return *this;
-  }
-  Vector< T > cpy(rhs);
-  swap(this, rhs);
-  return *this;
-}
-
-template< class T >
-topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
-{
-  if (this == std::addressof(rhs))
-  {
-    return *this;
-  }
-  Vector< T >cpy(std::move(rhs));
-  swap(cpy);
-  return *this;
-}
-
-template< class T >
-topit::Vector< T >::Vector(const Vector& rhs):
-  Vector(rhs.getSize())
-{
-  for (size_t i = 0; i < rhs.getSize(); ++i)
-  {
-    data_[i] = rhs[i];
-  }
-}
-
-template< class T >
-topit::Vector< T >::Vector(size_t size):
-  data_(size ? new T[size]: nullptr),
-  size_(size),
-  capacity_(size_)
-{}
-
-template< class T >
-topit::Vector< T >::Vector(size_t size, const T& init):
-  Vector(size)
-{
-  for (size_t i = 0; i < size; ++i)
-  {
-    data_[i] = init;
-  }
-}
-
-template< class T >
-topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
-  data_(rhs.data_),
-  size_(rhs.size_),
-  capacity_(rhs.capacity_)
-{
-  rhs.data_ = nullptr;
-}
-
-template< class T >
-bool topit::operator==(const Vector< T >& rhs, const Vector< T >& lhs)
-{
-  bool isEqual = lhs.getSize() == rhs.getSize();
-  for (size_t i = 0; (i < lhs.getSize()) && (isEqual = isEqual && lhs[i] == rhs[i]); ++i);
-  return isEqual;
-}
-
-template< class T >
-T& topit::Vector< T >::at(size_t id)
-{
-  const Vector< T >* cthis = this;
-  return const_cast< T& >(cthis->at(id));
-}
-
-
-
-template< class T >
-const T& topit::Vector< T >::at(size_t id) const
-{
-  if (id < getSize())
-  {
-    return (*this)[id];
-  }
-  throw std::out_of_range("bad id");
 }
 
 template< class T >
@@ -222,14 +194,13 @@ void topit::Vector< T >::popBack()
   T* newData = nullptr;
   try
   {
-    newData = new T[capacity_ - 1];
+    newData = new T[capacity_];
     for (size_t i = 0; i < size_ - 1; ++i)
     {
       newData[i] = data_[i];
     }
     delete[] data_;
     data_ = newData;
-    --capacity_;
     --size_;
   }
   catch(...)
@@ -240,15 +211,49 @@ void topit::Vector< T >::popBack()
 }
 
 template< class T >
+void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
+{
+  std::swap(data_, rhs.data_);
+  std::swap(size_, rhs.size_);
+  std::swap(capacity_, rhs.capacity_);
+}
+
+
+template< class T >
+void topit::Vector< T >::extend(T** oldData, size_t& k, const T& newT)
+{
+  T* newData = nullptr;
+  try
+  {
+    newData = new T[k * 2];
+    for (size_t i = 0; i < k; ++i)
+    {
+      newData[i] = (*oldData)[i];
+    }
+    newData[k++] = newT;
+  }
+  catch(...)
+  {
+    delete[] newData;
+    throw;
+  }
+
+  delete[] *oldData;
+  *oldData = newData;
+}
+
+template< class T >
 topit::Vector< T >::~Vector()
 {
   delete[] data_;
 }
 
 template< class T >
-topit::Vector< T >::Vector():
-  data_(nullptr),
-  size_(0),
-  capacity_(0)
-{}
+bool topit::operator==(const Vector< T >& rhs, const Vector< T >& lhs)
+{
+  bool isEqual = lhs.getSize() == rhs.getSize();
+  for (size_t i = 0; (i < lhs.getSize()) && (isEqual = isEqual && lhs[i] == rhs[i]); ++i);
+  return isEqual;
+}
+
 #endif
