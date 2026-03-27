@@ -219,6 +219,95 @@ bool testMoveOperatorforNonEmpty()
   }
 }
 
+bool testInsertElementIntoEmptyVector()
+{
+  topit::Vector< int > v;
+  v.insert(3, 4);
+
+  return v.getSize() == 4 && v.getCapacity() == 8 && v[3] == 4;
+}
+
+bool testInsertElementIntoNonEmptyVector()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.insert(1, 4);
+  return v[0] == 1 && v[1] == 4 && v[2] == 2 && v[3] == 3;
+}
+
+bool testInsertFewElementsIntoEmptyVector()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+
+  topit::Vector< int > yav;
+  yav.insert(v, 0, 3, 0);
+
+  return yav[0] == 1 && yav[1] == 2 && yav[2] == 3;
+}
+
+bool testInsertFewElementsIntoNonEmptyVector()
+{
+  topit::Vector< int > v;
+  v.pushBack(2);
+  v.pushBack(3);
+  v.pushBack(4);
+
+  topit::Vector< int > yav;
+  yav.pushBack(1);
+  yav.pushBack(5);
+  yav.pushBack(6);
+
+  yav.insert(v, 0, 3, 1);
+
+  return yav[0] == 1 && yav[1] == 2 && yav[2] == 3 && yav[3] == 4 && yav[4] == 5 && yav[5] == 6;
+}
+
+bool testEraseElementInEmpyVector()
+{
+  topit::Vector< int > v;
+  v.erase(0);
+  topit::Vector< int > yav;
+  return v == yav;
+}
+
+bool testEraseElementInNonEmpyVector()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.erase(0);
+  v.erase(2);
+  return v[0] == 2;
+}
+
+bool testEraseFewElementsInEmpyVector()
+{
+  topit::Vector< int > v;
+  v.erase(0, 4);
+  topit::Vector< int > yav;
+  return v == yav;
+}
+
+bool testEraseFewElementsInNonEmpyVector()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.pushBack(4);
+  v.pushBack(5);
+  v.erase(1, 3);
+  bool res = v[0] == 1 && v[2] == 4 && v[3] == 5;
+  v.erase(0, 2);
+  return res && v[0] == 3;
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() > ;
@@ -240,6 +329,14 @@ int main()
     { "Move constructor for non empty vector", testMoveConstructorforNonEmpty },
     { "Move operator for empty vector", testMoveOperatorforEmpty },
     { "Move operator for non empty vector", testMoveOperatorforNonEmpty },
+    { "Insert element into empty vector", testInsertElementIntoEmptyVector},
+    { "Insert element into non empty vector", testInsertElementIntoNonEmptyVector},
+    { "Insert few elements into empty vector", testInsertFewElementsIntoEmptyVector},
+    { "Insert few elements into non empty vector", testInsertFewElementsIntoNonEmptyVector},
+    { "Erase element in empty vector", testEraseElementInEmpyVector},
+    { "Erase element in non empty vector", testEraseElementInNonEmpyVector},
+    { "Erase few elements in empty vector", testEraseFewElementsInEmpyVector},
+    { "Erase few elements in non empty vector", testEraseFewElementsInNonEmpyVector},
   };
   std::cout << "TESTS\n";
   const size_t count = sizeof(tests) / sizeof(test_t);

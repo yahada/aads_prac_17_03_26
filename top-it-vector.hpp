@@ -14,8 +14,8 @@ namespace topit
     Vector(Vector&&) noexcept;
     Vector(size_t size, const T& init);
 
-    Vector& operator=(const Vector&);
-    Vector& operator=(Vector&&) noexcept;
+    Vector< T >& operator=(const Vector&);
+    Vector< T >& operator=(Vector&&) noexcept;
 
     T& operator[](size_t id) noexcept;
     const T& operator[](size_t id) const noexcept;
@@ -29,8 +29,10 @@ namespace topit
 
     void pushBack(const T& v);
     void popBack();
-    void insert(size_t i, const T& v);
-    void erase(size_t i);
+    void insert(size_t pos, const T& v);
+    void insert(const Vector< T >& another, size_t start, size_t end, size_t pos);
+    void erase(size_t pos);
+    void erase(size_t start, size_t end);
     void swap(Vector< T >& rhs) noexcept;
 
   private:
@@ -168,36 +170,109 @@ size_t topit::Vector< T >::getCapacity() const noexcept
 template< class T >
 void topit::Vector< T >::pushBack(const T& v)
 {
-  if (capacity_ == 0)
-  {
-    data_ = new T[8];
-    capacity_ = 8;
-  } else if (size_ >= capacity_)
-  {
-    extend(&data_, size_, v);
-    capacity_ *= 2;
-    return;
-  }
-
-  data_[size_] = v;
-  size_++;
+  insert(size_, v);
 }
 
 template< class T >
 void topit::Vector< T >::popBack()
+{
+  erase(size_);
+}
+
+template< class T >
+void topit::Vector< T >::insert(size_t pos, const T& v)
+{
+  T* newData = nullptr;
+  size_t newCapacity = 0;
+  if (capacity_ == 0)
+  {
+    newData = new T[8];
+    newCapacity = 8;
+  }
+  else if (pos >= capacity_)
+  {
+    newData = new T[pos + 1];
+    newCapacity = pos + 1;
+  }
+  else if (size_ + 1 >= capacity_)
+  {
+    newData = new T[capacity_ * 2];
+    newCapacity = capacity_ * 2;
+  } else
+  {
+    newData = new T[capacity_];
+    newCapacity = capacity_;
+  }
+
+  size_t i = 0;
+  try
+  {
+    if (pos > size_)
+    {
+      for (; i < size_; ++i)
+      {
+        newData[i] = data_[i];
+      }
+      newData[pos] = v;
+      size_ = pos + 1;
+    } else
+    {
+      for (; i < pos; ++i)
+      {
+        newData[i] = data_[i];
+      }
+      newData[pos] = v;
+      for (; i < size_; ++i)
+      {
+        newData[i + 1] = data_[i];
+      }
+      size_++;
+    }
+  }
+  catch(...)
+  {
+    delete[] newData;
+    throw;
+  }
+  capacity_ = newCapacity;
+  delete[] data_;
+  data_ = newData;
+}
+
+template< class T >
+void topit::Vector< T >::insert(const Vector< T >& another, size_t start, size_t end, size_t pos)
+{
+  for (size_t i = start; i < end; ++i)
+  {
+    insert(pos++, another[i]);
+  }
+}
+
+template< class T >
+void topit::Vector< T >::erase(size_t pos)
+{
+  erase(pos, pos + 2);
+}
+
+template< class T >
+void topit::Vector< T >::erase(size_t start, size_t end)
 {
   if (!size_)
   {
     return;
   }
 
-  T* newData = nullptr;
+  T* newData = new T[capacity_];
   try
   {
-    newData = new T[capacity_];
-    for (size_t i = 0; i < size_ - 1; ++i)
+    size_t i = 0;
+    for (; i < start; ++i)
     {
       newData[i] = data_[i];
+    }
+    for (size_t j = end - 1; j < size_; ++j, ++i)
+    {
+      newData[i] = data_[j];
     }
     delete[] data_;
     data_ = newData;
@@ -210,36 +285,13 @@ void topit::Vector< T >::popBack()
   }
 }
 
+
 template< class T >
 void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
 {
   std::swap(data_, rhs.data_);
   std::swap(size_, rhs.size_);
   std::swap(capacity_, rhs.capacity_);
-}
-
-
-template< class T >
-void topit::Vector< T >::extend(T** oldData, size_t& k, const T& newT)
-{
-  T* newData = nullptr;
-  try
-  {
-    newData = new T[k * 2];
-    for (size_t i = 0; i < k; ++i)
-    {
-      newData[i] = (*oldData)[i];
-    }
-    newData[k++] = newT;
-  }
-  catch(...)
-  {
-    delete[] newData;
-    throw;
-  }
-
-  delete[] *oldData;
-  *oldData = newData;
 }
 
 template< class T >
