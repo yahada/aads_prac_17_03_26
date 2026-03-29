@@ -33,7 +33,7 @@ bool testCapacityOfVector()
   v.pushBack(3);
   v.pushBack(4);
   v.pushBack(5);
-  return res && v.getCapacity() == 16;;
+  return res && v.getCapacity() == 16;
 }
 
 bool testPushBack()
@@ -216,6 +216,50 @@ bool testMoveOperatorforNonEmpty()
   {
     return yav == copyV;
   }
+}
+
+bool testBegin()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+
+  topit::VecIter< int > it = v.begin();
+  return *(it) == 1;
+}
+
+bool testConstBegin()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+
+  topit::VecConstIter< int > it = v.cbegin();
+  return *(it) == 1;
+}
+
+bool testEnd()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+
+  topit::VecIter< int > it = --v.end();
+  return *(it) == 3;
+}
+
+bool testConstEnd()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+
+  topit::VecConstIter< int > it = --v.cend();
+  return *(it) == 3;
 }
 
 bool testInsertElementIntoEmptyVector()
@@ -411,6 +455,10 @@ int main()
     { "Move constructor for non empty vector", testMoveConstructorforNonEmpty },
     { "Move operator for empty vector", testMoveOperatorforEmpty },
     { "Move operator for non empty vector", testMoveOperatorforNonEmpty },
+    { "Begin of the vector", testBegin},
+    { "Const begin of the vector", testConstBegin},
+    { "End of the vector", testEnd},
+    { "Const end of the vector", testConstEnd},
     { "Insert element into empty vector", testInsertElementIntoEmptyVector},
     { "Insert element into non empty vector", testInsertElementIntoNonEmptyVector},
     { "Insert few elements into empty vector", testInsertFewElementsIntoEmptyVector},

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include "top-it-iterator.hpp"
+#include "top-it-const-iterator.hpp"
 namespace topit
 {
   template< class T >
@@ -30,7 +31,9 @@ namespace topit
     size_t getCapacity() const noexcept;
 
     VecIter< T > begin() const;
+    VecConstIter< T > cbegin() const;
     VecIter< T > end() const;
+    VecConstIter< T > cend() const;
 
     void pushBack(const T& v);
     void popBack();
@@ -190,6 +193,20 @@ template< class T >
 topit::VecIter< T > topit::Vector< T >::end() const
 {
   VecIter< T > it = VecIter< T >{data_, size_, size_};
+  return it;
+}
+
+template< class T >
+topit::VecConstIter< T > topit::Vector< T >::cbegin() const
+{
+  VecConstIter< T > it = VecConstIter< T >{data_, size_, 0};
+  return it;
+}
+
+template< class T >
+topit::VecConstIter< T > topit::Vector< T >::cend() const
+{
+  VecConstIter< T > it = VecConstIter< T >{data_, size_, size_};
   return it;
 }
 

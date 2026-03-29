@@ -1,6 +1,7 @@
 #ifndef TOP_IT_ITERATOR_HPP
 #define TOP_IT_ITERATOR_HPP
 #include <cassert>
+#include <cstddef>
 namespace topit
 {
   template< class T > struct Vector;
@@ -46,6 +47,7 @@ topit::VecIter< T >::VecIter(T* data, size_t size, size_t pos):
 template< class T >
 topit::VecIter< T >& topit::VecIter< T >::operator++()
 {
+  assert(pos_ != size_);
   ++pos_;
   return *this;
 }
@@ -53,6 +55,7 @@ topit::VecIter< T >& topit::VecIter< T >::operator++()
 template< class T >
 topit::VecIter< T > topit::VecIter< T >::operator++(int)
 {
+  assert(pos_ != size_);
   VecIter< T >tmp{*this};
   ++(*this);
   return tmp;
@@ -62,6 +65,7 @@ topit::VecIter< T > topit::VecIter< T >::operator++(int)
 template< class T >
 topit::VecIter< T >& topit::VecIter< T >::operator--()
 {
+  assert(pos_ != 0);
   pos_--;
   return *this;
 }
@@ -69,6 +73,7 @@ topit::VecIter< T >& topit::VecIter< T >::operator--()
 template< class T >
 topit::VecIter< T > topit::VecIter< T >::operator--(int)
 {
+  assert(pos_ != 0);
   VecIter< T >tmp{*this};
   --(*this);
   return tmp;
@@ -78,12 +83,14 @@ topit::VecIter< T > topit::VecIter< T >::operator--(int)
 template< class T >
 T& topit::VecIter< T >::operator*()
 {
+  assert(data_ != nullptr);
   return data_[pos_];
 }
 
 template< class T >
 T* topit::VecIter< T >::operator->()
 {
+  assert(data_ != nullptr);
   return std::addressof(data_[pos_]);
 }
 
