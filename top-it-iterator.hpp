@@ -9,7 +9,7 @@ namespace topit
   struct VecIter {
   public:
     VecIter();
-    VecIter< T >& operator++();//
+    VecIter< T >& operator++();
     VecIter< T > operator++(int);
 
     VecIter< T >& operator--();
