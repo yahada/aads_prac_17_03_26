@@ -46,14 +46,29 @@ bool testPushBack()
   return res && v[1] == 2;
 }
 
-// bool testPopBack()
-// {
-//   topit::Vector< int > v;
-//   v.pushBack(1);
-//   v.pushBack(2);
-//   v.popBack();
-//   return v[0] == 1 && v.getSize() == 1 && v.getCapacity() == 8;
-// }
+bool testPushBackCount()
+{
+  topit::Vector< int > v;
+  v.pushBackCount(3, 4);
+  return v[0] == 4 && v[1] == 4 && v[2] == 4;
+}
+
+bool testPushBackRange()
+{
+  topit::Vector< int > v({1, 2, 3});
+  topit::Vector< int > yav({4, 5});
+  v.pushBackRange(yav.begin(), 2);
+  return v[3] == 4 && v[4] == 5;
+}
+
+bool testPopBack()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.popBack();
+  return v[0] == 1 && v.getSize() == 1 && v.getCapacity() == 8;
+}
 
 bool testElementInboundAccess()
 {
@@ -149,7 +164,6 @@ bool testCopyOperatorforNonEmpty()
   v.pushBack(1);
   topit::Vector< int > yav;
   yav = v;
-  std::cout << v[0] << '\n';
   return v == yav;
 }
 
@@ -270,23 +284,29 @@ bool testConstEnd()
   return *(it) == 3;
 }
 
-// bool testInsertElementIntoEmptyVector()
-// {
-//   topit::Vector< int > v;
-//   v.insert(3, 4);
+bool testInsertElementIntoEmptyVector()
+{
+  topit::Vector< int > v;
+  try
+  {
+    v.insert(3, 4);
+    return false;
+  }
+  catch(const std::out_of_range& e)
+  {
+    return true;
+  }
+}
 
-//   return v.getSize() == 4 && v.getCapacity() == 8 && v[3] == 4;
-// }
-
-// bool testInsertElementIntoNonEmptyVector()
-// {
-//   topit::Vector< int > v;
-//   v.pushBack(1);
-//   v.pushBack(2);
-//   v.pushBack(3);
-//   v.insert(1, 4);
-//   return v[0] == 1 && v[1] == 4 && v[2] == 2 && v[3] == 3;
-// }
+bool testInsertElementIntoNonEmptyVector()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.insert(1, 4);
+  return v[0] == 1 && v[1] == 4 && v[2] == 2 && v[3] == 3;
+}
 
 // bool testInsertFewElementsIntoEmptyVector()
 // {
@@ -318,17 +338,17 @@ bool testConstEnd()
 //   return yav[0] == 1 && yav[1] == 2 && yav[2] == 3 && yav[3] == 4 && yav[4] == 5 && yav[5] == 6;
 // }
 
-// bool testInsertElementWithIterator()
-// {
-//   topit::Vector< int > v;
-//   v.pushBack(1);
-//   v.pushBack(2);
-//   v.pushBack(3);
+bool testInsertElementWithIterator()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
 
-//   topit::VecIter< int > it = v.begin();
-//   v.insert(it, 4);
-//   return v[0] == 4;
-// }
+  topit::VecIter< int > it = v.begin();
+  v.insert(it, 4);
+  return v[0] == 4;
+}
 
 // bool testInsertSameElementsWithIterator()
 // {
@@ -441,6 +461,13 @@ bool testConstEnd()
 //   return v[0] == 3 && v[1] == 4 && v[2] == 5;
 // }
 
+bool testShrimpToFit()
+{
+  topit::Vector< int > v({1, 2 , 3, 4});
+  v.shrimpToFit();
+  return v.getSize() == 4 && v.getCapacity() == 4;
+}
+
 
 int main()
 {
@@ -450,7 +477,9 @@ int main()
     { "Size of vector", testSizeOfVector },
     { "Capacity of vector", testCapacityOfVector },
     { "Push value to the back", testPushBack },
-    // { "Pop value from back", testPopBack },
+    { "Push back few same elements", testPushBackCount},
+    { "Push back few elements with iterator", testPushBackRange},
+    { "Pop value from back", testPopBack },
     { "Inbound access", testElementInboundAccess },
     { "Out of bound access", testElementOutOfBoundAccess },
     { "Inbound const access", testElementInboundConstAccess },
@@ -468,11 +497,11 @@ int main()
     { "Const begin of the vector", testConstBegin},
     { "End of the vector", testEnd},
     { "Const end of the vector", testConstEnd},
-    // { "Insert element into empty vector", testInsertElementIntoEmptyVector},
-    // { "Insert element into non empty vector", testInsertElementIntoNonEmptyVector},
+    { "Insert element into empty vector", testInsertElementIntoEmptyVector},
+    { "Insert element into non empty vector", testInsertElementIntoNonEmptyVector},
     // { "Insert few elements into empty vector", testInsertFewElementsIntoEmptyVector},
     // { "Insert few elements into non empty vector", testInsertFewElementsIntoNonEmptyVector},
-    // { "Insert element with iterator", testInsertElementWithIterator},
+    { "Insert element with iterator", testInsertElementWithIterator},
     // { "Insert same elements with iterator", testInsertSameElementsWithIterator},
     // { "Insert elements from another vector with iterator", testInsertElementsFromAnotherVecWithIterator},
     // { "Erase element in empty vector", testEraseElementInEmpyVector},
@@ -482,6 +511,7 @@ int main()
     // { "Erase element with iterator", testEraseElementWithIterator},
     // { "Erase few elements with iterator", testEraseFewElementsWithIterator},
     // { "Erase range of elements with iterator", testEraseRangeOfElementsWithIterator},
+    { "Shrimp to fit", testShrimpToFit},
   };
   std::cout << "TESTS\n";
   const size_t count = sizeof(tests) / sizeof(test_t);
@@ -506,4 +536,5 @@ int main()
   std::cout << "Successful tests: " << countSuccessTests << '\n';
   std::cout << "Failed tests: " << countFailedTests << '\n';
   std::cout << "RESULT: " << pass << '\n';
+
 }

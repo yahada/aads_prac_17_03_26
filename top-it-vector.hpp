@@ -34,7 +34,6 @@ namespace topit
     void reserve(size_t);
     void shrimpToFit();
     void pushBackCount(size_t k, const T& v);
-    void unsafePushBack(const T& v); //private
     template< class IT >
     void pushBackRange(IT b, size_t c);
 
@@ -60,6 +59,7 @@ namespace topit
     void swap(Vector< T >& rhs) noexcept;
 
   private:
+    void unsafePushBack(const T& v);
     explicit Vector(size_t size);
     void destroy();
     T* data_;
@@ -283,33 +283,63 @@ void topit::Vector< T >::shrimpToFit()
 template< class T >
 void topit::Vector< T >::pushBack(const T& v)
 {
-  if (capacity_ == 0)
+  if (size_ >= capacity_)
   {
-    reserve(8);
-  } else if (size_ >= capacity_)
+    Vector< T > temp(*this);
+    temp.reserve(temp.capacity_ == 0 ? 8 : temp.capacity_ * 2);
+    temp.unsafePushBack(v);
+    swap(temp);
+  } else
   {
-    reserve(capacity_ * 2);
+    unsafePushBack(v);
   }
-  unsafePushBack(v);
 }
 
-// template< class T >
-// template< class IT >
-// void topit::Vector< T >::pushBackRange(IT b, size_t c) // Не (IT e) потому что заставляет писать плохой код
-// {
-//   // Если памяти не хватает на с
-//   // -делаем так, чтоб хватило на k*
-//   // Добавляем в конец
-// }
+template< class T >
+template< class IT >
+void topit::Vector< T >::pushBackRange(IT b, size_t k) // Не (IT e) потому что заставляет писать плохой код
+{
+  if (size_ + k >= capacity_)
+  {
+    Vector< T > temp(*this);
+    temp.reserve(temp.capacity_ == 0 ? k : temp.size_ + k);
+    for (size_t i = 0; i < k; ++i)
+    {
+      temp.unsafePushBack(*b);
+      ++b;
+    }
+    swap(temp);
+  } else
+  {
+    for (size_t i = 0; i < k; ++i)
+    {
+      unsafePushBack(*b);
+      ++b;
+    }
+  }
+}
 
 
-// template< class T >
-// void topit::Vector< T >::pushBackCount(size_t k, const T& v)
-// {
-//   // Если памяти не хватает на k
-//   // -делаем так, чтоб хватило на k*
-//   // Добавляем в конец
-// }
+template< class T >
+void topit::Vector< T >::pushBackCount(size_t k, const T& v)
+{
+  if (size_ + k >= capacity_)
+  {
+    Vector< T > temp(*this);
+    temp.reserve(temp.capacity_ == 0 ? k : temp.size_ + k);
+    for (size_t i = 0; i < k; ++i)
+    {
+      temp.unsafePushBack(v);
+    }
+    swap(temp);
+  } else
+  {
+    for (size_t i = 0; i < k; ++i)
+    {
+      unsafePushBack(v);
+    }
+  }
+}
 
 template< class T >
 void topit::Vector< T >::unsafePushBack(const T& v) // Без проверки. Вызывается во всех остальных push back
@@ -319,26 +349,41 @@ void topit::Vector< T >::unsafePushBack(const T& v) // Без проверки. 
   ++size_;
 }
 
-// template< class T >
-// void topit::Vector< T >::popBack()
-// {
+template< class T >
+void topit::Vector< T >::popBack()
+{
+  if (!size_)
+  {
+    return;
+  }
+  data_[size_ - 1].~T();
+  --size_;
+}
 
-// }
+template< class T >
+void topit::Vector< T >::insert(VecIter< T > pos, const T& v)
+{
+  size_t p = pos - begin();
+  insert(p, v);
+}
 
-// template< class T >
-// void topit::Vector< T >::insert(VecIter< T > pos, const T& v)
-// {
-//   insert(pos.pos_, v);
-// }
-
-// template< class T >
-// void topit::Vector< T >::insert(VecIter< T > pos, size_t count, const T& v)
-// {
-//   for (size_t i = 0; i < count; ++i)
-//   {
-//     insert(pos.pos_, v);
-//   }
-// }
+template< class T >
+void topit::Vector< T >::insert(VecIter< T > pos, size_t count, const T& v)
+{
+  Vector< T > temp(*this);
+  if (temp.size_ + count >= temp.capacity_)
+  {
+    temp.reserve(temp.capacity_ == 0 ? 8 : temp.capacity_ * 2);
+  }
+  for (size_t i = temp.size_; i > pos; --i)
+  {
+    new (temp.data_ + i) T(std::move(temp.data_[i - 1]));
+    temp.data_[i].~T();
+  }
+  new (&temp.data_[pos]) T(v);
+  ++temp.size_;
+  swap(temp);
+}
 
 // template< class T >
 // void topit::Vector< T >::insert(VecIter< T > pos, VecIter< T > start, VecIter< T > end)
@@ -351,65 +396,27 @@ void topit::Vector< T >::unsafePushBack(const T& v) // Без проверки. 
 //   }
 // }
 
-// template< class T >
-// void topit::Vector< T >::insert(size_t pos, const T& v)
-// {
-//   T* newData = nullptr;
-//   size_t newCapacity = 0;
-//   if (capacity_ == 0)
-//   {
-//     newData = new T[8];
-//     newCapacity = 8;
-//   }
-//   else if (pos >= capacity_)
-//   {
-//     newData = new T[pos + 1];
-//     newCapacity = pos + 1;
-//   }
-//   else if (size_ + 1 >= capacity_)
-//   {
-//     newData = new T[capacity_ * 2];
-//     newCapacity = capacity_ * 2;
-//   } else
-//   {
-//     newData = data_;
-//     newCapacity = capacity_;
-//   }
+template< class T >
+void topit::Vector< T >::insert(size_t pos, const T& v)
+{
+  if (pos > size_) {
+    throw std::out_of_range("insert: pos > size");
+  }
 
-//   size_t i = 0;
-//   try
-//   {
-//     if (pos > size_)
-//     {
-//       for (; i < size_; ++i)
-//       {
-//         newData[i] = data_[i];
-//       }
-//       newData[pos] = v;
-//       size_ = pos + 1;
-//     } else
-//     {
-//       for (; i < pos; ++i)
-//       {
-//         newData[i] = data_[i];
-//       }
-//       newData[pos] = v;
-//       for (; i < size_; ++i)
-//       {
-//         newData[i + 1] = data_[i];
-//       }
-//       size_++;
-//     }
-//   }
-//   catch(...)
-//   {
-//     delete[] newData;
-//     throw;
-//   }
-//   capacity_ = newCapacity;
-//   delete[] data_;
-//   data_ = newData;
-// }
+  Vector< T > temp(*this);
+  if (temp.size_ >= temp.capacity_)
+  {
+    temp.reserve(temp.capacity_ == 0 ? 8 : temp.capacity_ * 2);
+  }
+  for (size_t i = temp.size_; i > pos; --i)
+  {
+    new (temp.data_ + i) T(std::move(temp.data_[i - 1]));
+    temp.data_[i].~T();
+  }
+  new (&temp.data_[pos]) T(v);
+  ++temp.size_;
+  swap(temp);
+}
 
 // template< class T >
 // void topit::Vector< T >::insert(const Vector< T >& another, size_t start, size_t end, size_t pos)

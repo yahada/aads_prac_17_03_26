@@ -11,9 +11,11 @@ namespace topit
     VecConstIter(const T* ptr);
     VecConstIter< T >& operator++();
     VecConstIter< T > operator++(int);
-
+    VecConstIter< T >& operator+(size_t);
     VecConstIter< T >& operator--();
     VecConstIter< T > operator--(int);
+    VecConstIter< T >& operator-(size_t);
+    std::ptrdiff_t operator-(VecConstIter< T > other) const;
 
     const T& operator*();
     const T* operator->();
@@ -52,6 +54,12 @@ topit::VecConstIter< T > topit::VecConstIter< T >::operator++(int)
 }
 
 template< class T >
+topit::VecConstIter< T >& topit::VecConstIter< T >::operator+(size_t n)
+{
+  return {ptr_ + n};
+}
+
+template< class T >
 topit::VecConstIter< T >& topit::VecConstIter< T >::operator--()
 {
   ptr_--;
@@ -64,6 +72,18 @@ topit::VecConstIter< T > topit::VecConstIter< T >::operator--(int)
   VecConstIter< T >tmp{*this};
   --(*this);
   return tmp;
+}
+
+template< class T >
+topit::VecConstIter< T >& topit::VecConstIter< T >::operator-(size_t n)
+{
+  return {ptr_ - n};
+}
+
+template< class T >
+std::ptrdiff_t topit::VecConstIter< T >::operator-(VecConstIter< T > other) const
+{
+  return ptr_ - other.ptr_;
 }
 
 template< class T >
