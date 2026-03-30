@@ -69,13 +69,13 @@ topit::VecIter< T > topit::VecIter< T >::operator--(int)
 template< class T >
 T& topit::VecIter< T >::operator*()
 {
-  return data_[pos_];
+  return *ptr_;
 }
 
 template< class T >
 T* topit::VecIter< T >::operator->()
 {
-  return std::addressof(data_[pos_]);
+  return std::addressof(ptr_);
 }
 
 template< class T >

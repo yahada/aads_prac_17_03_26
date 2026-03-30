@@ -69,13 +69,13 @@ topit::VecConstIter< T > topit::VecConstIter< T >::operator--(int)
 template< class T >
 const T& topit::VecConstIter< T >::operator*()
 {
-  return data_[pos_];
+  return *ptr_;
 }
 
 template< class T >
 const T* topit::VecConstIter< T >::operator->()
 {
-  return std::addressof(data_[pos_]);
+  return std::addressof(ptr_);
 }
 
 template< class T >
