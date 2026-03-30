@@ -61,6 +61,7 @@ namespace topit
 
   private:
     explicit Vector(size_t size);
+    void destroy();
     T* data_;
     size_t size_, capacity_;
   };
@@ -68,6 +69,23 @@ namespace topit
   bool operator==(const Vector< T >& rhs, const Vector< T >& lhs);
 }
 
+template< class T >
+void topit::Vector< T >::destroy()
+{
+  for (size_t i = 0; i < size_; ++i)
+  {
+    data_[i].~T();
+  }
+  size_ = 0;
+}
+
+
+template< class T >
+topit::Vector< T >::~Vector()
+{
+  destroy();
+  ::operator delete (data_);
+}
 
 template< class T >
 topit::Vector< T >::Vector():
@@ -227,9 +245,41 @@ topit::VecConstIter< T > topit::Vector< T >::cend() const
 }
 
 template< class T >
+void topit::Vector< T >::reserve(size_t newCapacity)
+{
+  T* newData = static_cast< T* >(::operator new (newCapacity * sizeof(T)));
+  size_t i = 0;
+  try
+  {
+    for (; i < std::min(newCapacity, size_); ++i)
+    {
+      new (newData + i) T(data_[i]);
+    }
+  }
+  catch(...)
+  {
+    for (size_t j = 0; j < i; ++j)
+    {
+      newData[i].~T();
+    }
+    ::operator delete (data_);
+  }
+  destroy();
+  ::operator delete (data_);
+  data_ = newData;
+  capacity_ = newCapacity;
+  size_ = i + 1;
+}
+
+
+template< class T >
 void topit::Vector< T >::pushBack(const T& v) // тут с проверкой
 {
-  insert(size_, v);
+  if (size_ >= capacity_)
+  {
+    reserve(capacity_ * 2);
+  }
+  unsafePushBack(v);
 }
 
 template< class T >
@@ -253,14 +303,17 @@ void topit::Vector< T >::pushBackCount(size_t k, const T& v)
 template< class T >
 void topit::Vector< T >::unsafePushBack(const T& v) // Без проверки. Вызывается во всех остальных push back
 {
-
+  assert(size_ < capacity_);
+  new (data_ + size_) T(v);
+  ++size_;
 }
 
 template< class T >
 void topit::Vector< T >::popBack()
 {
-  erase(size_);
+
 }
+
 template< class T >
 void topit::Vector< T >::insert(VecIter< T > pos, const T& v)
 {
@@ -425,12 +478,6 @@ void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
   std::swap(data_, rhs.data_);
   std::swap(size_, rhs.size_);
   std::swap(capacity_, rhs.capacity_);
-}
-
-template< class T >
-topit::Vector< T >::~Vector()
-{
-  delete[] data_;
 }
 
 template< class T >
