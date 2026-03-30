@@ -11,17 +11,24 @@ namespace topit
     VecConstIter(const T* ptr);
     VecConstIter< T >& operator++();
     VecConstIter< T > operator++(int);
-    VecConstIter< T >& operator+(size_t);
+    VecConstIter< T >& operator+(size_t) const noexcept;
+
+
     VecConstIter< T >& operator--();
     VecConstIter< T > operator--(int);
-    VecConstIter< T >& operator-(size_t);
+    VecConstIter< T >& operator-(size_t) const noexcept;
+
     std::ptrdiff_t operator-(VecConstIter< T > other) const;
+
+    bool operator==(const VecConstIter& other) const noexcept;
+    bool operator!=(const VecConstIter& other) const noexcept;
+    bool operator<(const VecConstIter& other) const noexcept;
+    bool operator>(const VecConstIter& other) const noexcept;
+    bool operator<=(const VecConstIter& other) const noexcept;
+    bool operator>=(const VecConstIter& other) const noexcept;
 
     const T& operator*();
     const T* operator->();
-
-    bool operator!=(const VecConstIter< T >& other) const;
-    bool operator==(const VecConstIter< T >& other) const;
   private:
     const T* ptr_;
   };
@@ -54,10 +61,11 @@ topit::VecConstIter< T > topit::VecConstIter< T >::operator++(int)
 }
 
 template< class T >
-topit::VecConstIter< T >& topit::VecConstIter< T >::operator+(size_t n)
+topit::VecConstIter< T >& topit::VecConstIter< T >::operator+(size_t n) const noexcept
 {
   return {ptr_ + n};
 }
+
 
 template< class T >
 topit::VecConstIter< T >& topit::VecConstIter< T >::operator--()
@@ -75,7 +83,7 @@ topit::VecConstIter< T > topit::VecConstIter< T >::operator--(int)
 }
 
 template< class T >
-topit::VecConstIter< T >& topit::VecConstIter< T >::operator-(size_t n)
+topit::VecConstIter< T >& topit::VecConstIter< T >::operator-(size_t n) const noexcept
 {
   return {ptr_ - n};
 }
@@ -85,6 +93,7 @@ std::ptrdiff_t topit::VecConstIter< T >::operator-(VecConstIter< T > other) cons
 {
   return ptr_ - other.ptr_;
 }
+
 
 template< class T >
 const T& topit::VecConstIter< T >::operator*()
@@ -99,15 +108,39 @@ const T* topit::VecConstIter< T >::operator->()
 }
 
 template< class T >
-bool topit::VecConstIter< T >::operator!=(const VecConstIter< T >& rhs) const
+bool topit::VecConstIter< T >::operator!=(const VecConstIter< T >& rhs) const noexcept
 {
   return !(*this == rhs);
 }
 
 template< class T >
-bool topit::VecConstIter< T >::operator==(const VecConstIter< T >& rhs) const
+bool topit::VecConstIter< T >::operator==(const VecConstIter< T >& rhs) const noexcept
 {
   return ptr_ == rhs.ptr_;
+}
+
+template< class T >
+bool topit::VecConstIter< T >::operator<(const VecConstIter& other) const noexcept
+{
+  return ptr_ < other.ptr_;
+}
+
+template< class T >
+bool topit::VecConstIter< T >::operator>(const VecConstIter& other) const noexcept
+{
+  return ptr_ > other.ptr_;
+}
+
+template< class T >
+bool topit::VecConstIter< T >::operator<=(const VecConstIter& other) const noexcept
+{
+  return ptr_ <= other.ptr_;
+}
+
+template< class T >
+bool topit::VecConstIter< T >::operator>=(const VecConstIter& other) const noexcept
+{
+  return ptr_ >= other.ptr_;
 }
 
 #endif

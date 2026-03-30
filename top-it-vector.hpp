@@ -372,6 +372,10 @@ void topit::Vector< T >::insert(VecIter< T > position, const T& value)
 template< class T >
 void topit::Vector< T >::insert(VecIter< T > position, size_t numberOfElements, const T& value)
 {
+  if (position < begin() || position > end()) {
+    throw std::out_of_range("insert: iterator out of range");
+  }
+
   Vector< T > temp(*this);
   size_t startPosition = position - begin();
   size_t new_size = temp.size_ + numberOfElements;
@@ -395,6 +399,10 @@ void topit::Vector< T >::insert(VecIter< T > position, size_t numberOfElements, 
 template< class T >
 void topit::Vector< T >::insert(VecIter< T > position, VecIter< T > startIterator, size_t numberOfElements)
 {
+  if (position < begin() || position > end()) {
+    throw std::out_of_range("insert: iterator out of range");
+  }
+
   Vector< T > temp(*this);
   size_t startPosition = position - begin();
   size_t new_size = temp.size_ + numberOfElements;
@@ -419,7 +427,7 @@ template< class T >
 void topit::Vector< T >::insert(size_t position, const T& value)
 {
   if (position > size_) {
-    throw std::out_of_range("insert: pos > size");
+    throw std::out_of_range("insert: position > size");
   }
 
   Vector< T > temp(*this);
@@ -450,7 +458,7 @@ void topit::Vector< T >::insert(const Vector< T >& anotherVector, size_t start, 
   }
   if (position > size_)
   {
-    throw std::out_of_range("insert: pos > this->size");
+    throw std::out_of_range("insert: position > this->size");
   }
 
   Vector< T > temp(*this);
@@ -476,66 +484,73 @@ void topit::Vector< T >::insert(const Vector< T >& anotherVector, size_t start, 
   swap(temp);
 }
 
-// template< class T >
-// void topit::Vector< T >::erase(size_t pos)
-// {
-//   erase(pos, pos + 2);
-// }
+template< class T >
+void topit::Vector< T >::erase(size_t position)
+{
+  if (position >= size_) {
+    throw std::out_of_range("erase: position >= size");
+  }
+
+  Vector< T > temp(*this);
+  for (size_t i = position; i < temp.size_; ++i)
+  {
+    temp.data_[i] = std::move(temp.data_[i + 1]);
+  }
+  --temp.size_;
+  swap(temp);
+}
+
+template< class T >
+void topit::Vector< T >::erase(size_t start, size_t end)
+{
+  if (start > end)
+  {
+    throw std::invalid_argument("erase: start > end");
+  }
+  if (end > size_)
+  {
+    throw std::out_of_range("erase: end > another.size");
+  }
+
+  size_t numberOfElements = end - start;
+  if (numberOfElements == 0)
+  {
+    return;
+  }
+  Vector<T> temp(*this);
+  for (size_t i = end; i < temp.size_; ++i) {
+    temp.data_[i - numberOfElements] = std::move(temp.data_[i]);
+  }
+  temp.size_ -= numberOfElements;
+  swap(temp);
+}
+
+template< class T >
+void topit::Vector< T >::erase(VecIter< T > position)
+{
+  size_t pos = position - begin();
+  erase(pos);
+}
+
+
+template< class T >
+void topit::Vector< T >::erase(VecIter< T > pos, size_t s)
+{
+
+}
 
 // template< class T >
-// void topit::Vector< T >::erase(size_t start, size_t end)
+// void topit::Vector< T >::erase(VecIter< T > beginIterator, VecIter< T > endIterator)
 // {
-//   if (!size_)
+//   if (beginIterator < begin() || endIterator > end() || beginIterator > endIterator)
 //   {
-//     return;
+//     throw std::out_of_range("erase: invalid range");
 //   }
 
-//   T* newData = new T[capacity_];
-//   try
-//   {
-//     size_t i = 0;
-//     for (; i < start; ++i)
-//     {
-//       newData[i] = data_[i];
-//     }
-//     for (size_t j = end - 1; j < size_; ++j, ++i)
-//     {
-//       newData[i] = data_[j];
-//     }
-//     delete[] data_;
-//     data_ = newData;
-//     --size_;
-//   }
-//   catch(...)
-//   {
-//     delete[] newData;
-//     throw;
-//   }
-// }
-
-// template< class T >
-// void topit::Vector< T >::erase(VecIter< T > pos)
-// {
-//   erase(pos.pos_);
-// }
-
-
-// template< class T >
-// void topit::Vector< T >::erase(VecIter< T > pos, size_t s)
-// {
-//   for (size_t i = 0; i < s; ++i)
-//   {
-//     erase(pos);
-//   }
-// }
-
-// template< class T >
-// void topit::Vector< T >::erase(VecIter< T > start, VecIter< T > end)
-// {
-//   size_t s = start.pos_;
-//   size_t e = end.pos_;
-
-//   erase(s, e);
+//   size_t b = beginIterator - begin();
+//   size_t e = endIterator - begin();
+//   size_t count = e - b;
+//   erase(b, b + count);
 // }
 
 
