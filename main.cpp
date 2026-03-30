@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <utility>
+#include <initializer_list>
 #include "top-it-iterator.hpp"
 
 bool testEmptyVector()
@@ -164,6 +165,12 @@ bool testMoveConstructorforEmpty()
   {
     return yav == copyV;
   }
+}
+
+bool testInitializerList()
+{
+  topit::Vector< int > v({1, 2});
+  return v.getSize() == 2 && (v[0] == 1) && (v[1] == 2);
 }
 
 bool testMoveConstructorforNonEmpty()
@@ -455,6 +462,7 @@ int main()
     { "Move constructor for non empty vector", testMoveConstructorforNonEmpty },
     { "Move operator for empty vector", testMoveOperatorforEmpty },
     { "Move operator for non empty vector", testMoveOperatorforNonEmpty },
+    { "Non-empty vector for non-empty initializer list", testInitializerList},
     { "Begin of the vector", testBegin},
     { "Const begin of the vector", testConstBegin},
     { "End of the vector", testEnd},

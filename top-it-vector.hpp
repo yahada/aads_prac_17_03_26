@@ -1,6 +1,7 @@
 #ifndef TOP_IT_VECTOR_HPP
 #define TOP_IT_VECTOR_HPP
 #include <cstddef>
+#include <initializer_list>
 #include <iostream>
 #include <memory>
 #include "top-it-iterator.hpp"
@@ -16,7 +17,7 @@ namespace topit
     Vector(const Vector&);
     Vector(Vector&&) noexcept;
     Vector(size_t size, const T& init);
-
+    explicit Vector(std::initializer_list< T > il);
     Vector< T >& operator=(const Vector&);
     Vector< T >& operator=(Vector&&) noexcept;
 
@@ -29,6 +30,13 @@ namespace topit
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
+    //Классная работа 30.03.26
+    void reserve(size_t);
+    void shrimpToFit();
+    void pushBackCount(size_t k, const T& v);
+    void unsafePushBack(const T& v); //private
+    template< class IT >
+    void pushBackRange(IT b, size_t c);
 
     VecIter< T > begin() const;
     VecConstIter< T > cbegin() const;
@@ -36,6 +44,7 @@ namespace topit
     VecConstIter< T > cend() const;
 
     void pushBack(const T& v);
+
     void popBack();
     void insert(size_t pos, const T& v);
     void insert(VecIter< T > pos, const T& v);
@@ -104,6 +113,18 @@ topit::Vector< T >::Vector(size_t size):
   size_(size),
   capacity_(size_)
 {}
+
+template< class T >
+topit::Vector< T >::Vector(std::initializer_list< T > il):
+  Vector(il.size())
+{
+  size_t i = 0;
+  for (auto it = il.begin(); it != il.end(); ++it)
+  {
+    data_[i++] = *it;
+  }
+}
+
 
 template< class T >
 topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
@@ -211,9 +232,33 @@ topit::VecConstIter< T > topit::Vector< T >::cend() const
 }
 
 template< class T >
-void topit::Vector< T >::pushBack(const T& v)
+void topit::Vector< T >::pushBack(const T& v) // тут с проверкой
 {
   insert(size_, v);
+}
+
+template< class T >
+template< class IT >
+void topit::Vector< T >::pushBackRange(IT b, size_t c) // Не (IT e) потому что заставляет писать плохой код
+{
+  // Если памяти не хватает на с
+  // -делаем так, чтоб хватило на k*
+  // Добавляем в конец
+}
+
+
+template< class T >
+void topit::Vector< T >::pushBackCount(size_t k, const T& v)
+{
+  // Если памяти не хватает на k
+  // -делаем так, чтоб хватило на k*
+  // Добавляем в конец
+}
+
+template< class T >
+void topit::Vector< T >::unsafePushBack(const T& v) // Без проверки. Вызывается во всех остальных push back
+{
+
 }
 
 template< class T >
@@ -268,7 +313,7 @@ void topit::Vector< T >::insert(size_t pos, const T& v)
     newCapacity = capacity_ * 2;
   } else
   {
-    newData = new T[capacity_];
+    newData = data_;
     newCapacity = capacity_;
   }
 
