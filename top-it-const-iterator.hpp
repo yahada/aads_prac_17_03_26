@@ -23,7 +23,7 @@ namespace topit
     bool operator!=(const VecConstIter< T >& other) const;
     bool operator==(const VecConstIter< T >& other) const;
   private:
-    friend class Vector< T >;
+    friend struct Vector< T >;
     VecConstIter(const T* data, size_t size, size_t pos);
     const T* data_;
     size_t size_;
