@@ -2,15 +2,13 @@
 #define TOP_IT_CONST_ITERATOR_HPP
 #include <cassert>
 #include <cstddef>
-
 namespace topit
 {
-  template< class T > struct Vector;
-
   template< class T >
   struct VecConstIter {
   public:
     VecConstIter();
+    VecConstIter(const T* ptr);
     VecConstIter< T >& operator++();
     VecConstIter< T > operator++(int);
 
@@ -23,75 +21,60 @@ namespace topit
     bool operator!=(const VecConstIter< T >& other) const;
     bool operator==(const VecConstIter< T >& other) const;
   private:
-    friend struct Vector< T >;
-    VecConstIter(const T* data, size_t size, size_t pos);
-    const T* data_;
-    size_t size_;
-    size_t pos_;
+    const T* ptr_;
   };
 }
 
 template< class T >
 topit::VecConstIter< T >::VecConstIter():
-  data_(nullptr),
-  size_(0),
-  pos_(0)
+  ptr_(nullptr)
 {}
 
+
 template< class T >
-topit::VecConstIter< T >::VecConstIter(const T* data, size_t size, size_t pos):
-  data_(data),
-  size_(size),
-  pos_(pos)
+topit::VecConstIter< T >::VecConstIter(const T* ptr):
+  ptr_(ptr)
 {}
 
 template< class T >
 topit::VecConstIter< T >& topit::VecConstIter< T >::operator++()
 {
-  assert(pos_ != size_);
-  ++pos_;
+  ++ptr_;
   return *this;
 }
 
 template< class T >
 topit::VecConstIter< T > topit::VecConstIter< T >::operator++(int)
 {
-  assert(pos_ != size_);
   VecConstIter< T >tmp{*this};
   ++(*this);
   return tmp;
 }
 
-
 template< class T >
 topit::VecConstIter< T >& topit::VecConstIter< T >::operator--()
 {
-  assert(pos_ != 0);
-  pos_--;
+  ptr_--;
   return *this;
 }
 
 template< class T >
 topit::VecConstIter< T > topit::VecConstIter< T >::operator--(int)
 {
-  assert(pos_ != 0);
   VecConstIter< T >tmp{*this};
   --(*this);
   return tmp;
 }
 
-
 template< class T >
 const T& topit::VecConstIter< T >::operator*()
 {
-  assert(data_ != nullptr);
   return data_[pos_];
 }
 
 template< class T >
 const T* topit::VecConstIter< T >::operator->()
 {
-  assert(data_ != nullptr);
   return std::addressof(data_[pos_]);
 }
 
@@ -104,7 +87,7 @@ bool topit::VecConstIter< T >::operator!=(const VecConstIter< T >& rhs) const
 template< class T >
 bool topit::VecConstIter< T >::operator==(const VecConstIter< T >& rhs) const
 {
-  return data_ == rhs.data_ && pos_ == rhs.pos_;
+  return ptr_ == rhs.ptr_;
 }
 
 #endif

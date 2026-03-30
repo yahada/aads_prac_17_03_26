@@ -60,7 +60,6 @@ namespace topit
     void swap(Vector< T >& rhs) noexcept;
 
   private:
-    void extend(T** oldData, size_t& k, const T& newT);
     explicit Vector(size_t size);
     T* data_;
     size_t size_, capacity_;
@@ -83,7 +82,7 @@ topit::Vector< T >::Vector(const Vector& rhs):
 {
   for (size_t i = 0; i < rhs.getSize(); ++i)
   {
-    data_[i] = rhs[i];
+    new (data_ + i) T(rhs[i]);
   }
 }
 
@@ -103,15 +102,15 @@ topit::Vector< T >::Vector(size_t size, const T& init):
 {
   for (size_t i = 0; i < size; ++i)
   {
-    data_[i] = init;
+    new (data_ + i) T(init);
   }
 }
 
 template< class T >
 topit::Vector< T >::Vector(size_t size):
-  data_(size ? new T[size]: nullptr),
+  data_(size ? static_cast< T* >(::operator new (size * sizeof(T)))),
   size_(size),
-  capacity_(size_)
+  capacity_(size)
 {}
 
 template< class T >
@@ -119,9 +118,9 @@ topit::Vector< T >::Vector(std::initializer_list< T > il):
   Vector(il.size())
 {
   size_t i = 0;
-  for (auto it = il.begin(); it != il.end(); ++it)
+  for (auto it = il.begin(); it != il.end(); ++it, ++i)
   {
-    data_[i++] = *it;
+    new (data_ + i) T(*it);
   }
 }
 
@@ -129,7 +128,7 @@ topit::Vector< T >::Vector(std::initializer_list< T > il):
 template< class T >
 topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
 {
-  if (this == std::addressof(rhs))
+  if (this != std::addressof(rhs))
   {
     return *this;
   }
@@ -206,29 +205,25 @@ size_t topit::Vector< T >::getCapacity() const noexcept
 template< class T >
 topit::VecIter< T > topit::Vector< T >::begin() const
 {
-  VecIter< T > it = VecIter< T >{data_, size_, 0};
-  return it;
+  return {data_};
 }
 
 template< class T >
 topit::VecIter< T > topit::Vector< T >::end() const
 {
-  VecIter< T > it = VecIter< T >{data_, size_, size_};
-  return it;
+  return {data_ + size_};
 }
 
 template< class T >
 topit::VecConstIter< T > topit::Vector< T >::cbegin() const
 {
-  VecConstIter< T > it = VecConstIter< T >{data_, size_, 0};
-  return it;
+  return {data_};
 }
 
 template< class T >
 topit::VecConstIter< T > topit::Vector< T >::cend() const
 {
-  VecConstIter< T > it = VecConstIter< T >{data_, size_, size_};
-  return it;
+  return {data_ + size_};
 }
 
 template< class T >
