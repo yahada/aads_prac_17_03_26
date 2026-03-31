@@ -13,435 +13,457 @@ bool testEmptyVector()
 
 bool testSizeOfVector()
 {
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
+  topit::Vector< int > v({1, 2});
   return v.getSize() == 2;
 }
 
-bool testCapacityOfVector()
-{
-  topit::Vector< int > v;
-  bool res = v.getCapacity() == 0;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
-  v.pushBack(4);
-  v.pushBack(5);
-  res = res && v.getCapacity() == 8;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
-  v.pushBack(4);
-  v.pushBack(5);
-  return res && v.getCapacity() == 16;
-}
+// bool testCapacityOfVector()
+// {
+//   topit::Vector< int > v;
+//   bool res = v.getCapacity() == 0;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   v.pushBack(3);
+//   v.pushBack(4);
+//   v.pushBack(5);
+//   res = res && v.getCapacity() == 8;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   v.pushBack(3);
+//   v.pushBack(4);
+//   v.pushBack(5);
+//   return res && v.getCapacity() == 16;
+// }
 
-bool testPushBack()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  bool res = v[0] == 1;
-  v.pushBack(2);
-  return res && v[1] == 2;
-}
+// bool testPushBack()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   bool res = v[0] == 1;
+//   v.pushBack(2);
+//   return res && v[1] == 2;
+// }
 
-bool testPushBackCount()
-{
-  topit::Vector< int > v;
-  v.pushBackCount(3, 4);
-  return v[0] == 4 && v[1] == 4 && v[2] == 4;
-}
+// bool testPushBackCount()
+// {
+//   topit::Vector< int > v;
+//   v.pushBackCount(2, 4);
+//   bool res = (v[0] == 4) && (v[1] == 4) && v.getSize() == 2 && v.getCapacity() == 8;
+//   v.pushBackCount(2, 5);
+//   return res && (v[2] == 5) && (v[3] == 5) && v.getSize() == 4 && v.getCapacity() == 8;
+// }
 
-bool testPushBackRange()
-{
-  topit::Vector< int > v({1, 2, 3});
-  topit::Vector< int > yav({4, 5});
-  v.pushBackRange(yav.begin(), 2);
-  return v[3] == 4 && v[4] == 5;
-}
+// bool testPushBackWithBeginRange()
+// {
+//   topit::Vector< int > v({1, 2});
+//   topit::Vector< int > yav({3, 4, 5, 6});
+//   v.pushBackRange(yav.begin(), 2);
+//   return (v[2] == 3) && (v[3] == 4);
+// }
 
-bool testPopBack()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.popBack();
-  return v[0] == 1 && v.getSize() == 1 && v.getCapacity() == 8;
-}
+// bool testPushBackWithMiddleRange()
+// {
+//   topit::Vector< int > v({1, 2});
+//   topit::Vector< int > yav({3, 4, 5, 6});
+//   v.pushBackRange(yav.begin() + 1, 2);
+//   return (v[2] == 4) && (v[3] == 5);
+// }
 
-bool testElementInboundAccess()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  try
-  {
-    int& val = v.at(0);
-    return val == 1;
-  }
-  catch(...)
-  {
-    return false;
-  }
-}
+// bool testPopBackEmpty()
+// {
+//   topit::Vector< int > v;
+//   v.popBack();
+//   topit::Vector< int > yav;
+//   return v == yav;
+// }
 
-bool testElementOutOfBoundAccess()
-{
-  topit::Vector< int > v;
-  try
-  {
-    v.at(0);
-    return false;
-  }
-  catch(const std::out_of_range&)
-  {
-    return true;
-  } catch(...)
-  {
-    return false;
-  }
-}
+// bool testPopBackNonEmpty()
+// {
+//   topit::Vector< int > v({1, 2});
+//   v.popBack();
+//   return (v[0] == 1) && v.getSize() == 1;
+// }
 
-bool testElementInboundConstAccess()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  const topit::Vector< int >& rv = v;
-  try
-  {
-    const int& val = rv.at(0);
-    return val == 1;
-  }
-  catch(...)
-  {
-    return false;
-  }
-}
+// bool testElementInboundAccess()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   try
+//   {
+//     int& val = v.at(0);
+//     return val == 1;
+//   }
+//   catch(...)
+//   {
+//     return false;
+//   }
+// }
 
-bool testElementOutOfBoundConstAccess()
-{
-  const topit::Vector< int > v;
-  try
-  {
-    v.at(0);
-    return false;
-  }
-  catch(const std::out_of_range&)
-  {
-    return true;
-  } catch(...)
-  {
-    return false;
-  }
-}
+// bool testElementOutOfBoundAccess()
+// {
+//   topit::Vector< int > v;
+//   try
+//   {
+//     v.at(0);
+//     return false;
+//   }
+//   catch(const std::out_of_range&)
+//   {
+//     return true;
+//   } catch(...)
+//   {
+//     return false;
+//   }
+// }
 
-bool testCopyConstructorforEmpty()
-{
-  topit::Vector< int > v;
-  topit::Vector< int > yav = v;
-  return v == yav;
-}
+// bool testElementInboundConstAccess()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   const topit::Vector< int >& rv = v;
+//   try
+//   {
+//     const int& val = rv.at(0);
+//     return val == 1;
+//   }
+//   catch(...)
+//   {
+//     return false;
+//   }
+// }
 
-bool testCopyConstructorforNonEmpty()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  topit::Vector< int > yav = v;
-  return v == yav;
-}
+// bool testElementOutOfBoundConstAccess()
+// {
+//   const topit::Vector< int > v;
+//   try
+//   {
+//     v.at(0);
+//     return false;
+//   }
+//   catch(const std::out_of_range&)
+//   {
+//     return true;
+//   } catch(...)
+//   {
+//     return false;
+//   }
+// }
 
-bool testCopyOperatorforEmpty()
-{
-  topit::Vector< int > v;
-  topit::Vector< int > yav;
-  yav = v;
-  return v == yav;
-}
+// bool testCopyConstructorforEmpty()
+// {
+//   topit::Vector< int > v;
+//   topit::Vector< int > yav = v;
+//   return v == yav;
+// }
 
-bool testCopyOperatorforNonEmpty()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  topit::Vector< int > yav;
-  yav = v;
-  return v == yav;
-}
+// bool testCopyConstructorforNonEmpty()
+// {
+//   topit::Vector< int > v({1});
+//   topit::Vector< int > yav = v;
+//   return v == yav;
+// }
 
-bool testMoveConstructorforEmpty()
-{
-  topit::Vector< int > v;
-  topit::Vector< int > copyV(v);
-  topit::Vector< int > yav(std::move(v));
-  try
-  {
-    v.at(0);
-    return false;
-  } catch(const std::out_of_range&)
-  {
-    return yav == copyV;
-  }
-}
+// bool testCopyOperatorforEmpty()
+// {
+//   topit::Vector< int > v;
+//   topit::Vector< int > yav;
+//   yav = v;
+//   return v == yav;
+// }
 
-bool testInitializerList()
-{
-  topit::Vector< int > v({1, 2});
-  return v.getSize() == 2 && (v[0] == 1) && (v[1] == 2);
-}
+// bool testCopyOperatorforNonEmpty()
+// {
+//   topit::Vector< int > v({1});
+//   topit::Vector< int > yav;
+//   yav = v;
+//   return v == yav;
+// }
 
-bool testMoveConstructorforNonEmpty()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  topit::Vector< int > copyV(v);
-  topit::Vector< int > yav(std::move(v));
-  try
-  {
-    v.at(0);
-    return false;
-  } catch(const std::out_of_range&)
-  {
-    return yav == copyV;
-  }
-}
+// bool testMoveConstructorforEmpty()
+// {
+//   topit::Vector< int > v;
+//   topit::Vector< int > copyV(v);
+//   topit::Vector< int > yav(std::move(v));
+//   try
+//   {
+//     v.at(0);
+//     return false;
+//   } catch(const std::out_of_range&)
+//   {
+//     return yav == copyV;
+//   }
+// }
+
+// bool testNonEmptyInitializerList()
+// {
+//   topit::Vector< int > v({1, 2});
+//   return v.getSize() == 2 && (v[0] == 1) && (v[1] == 2);
+// }
+
+// bool testEmptyInitializerList()
+// {
+//   topit::Vector< int > v({});
+//   topit::Vector< int > yav;
+//   return yav == v;
+// }
+
+// bool testMoveConstructorforNonEmpty()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   topit::Vector< int > copyV(v);
+//   topit::Vector< int > yav(std::move(v));
+//   try
+//   {
+//     v.at(0);
+//     return false;
+//   } catch(const std::out_of_range&)
+//   {
+//     return yav == copyV;
+//   }
+// }
 
 
-bool testMoveOperatorforEmpty()
-{
-  topit::Vector< int > v;
-  topit::Vector< int > copyV(v);
-  topit::Vector< int > yav;
-  yav = std::move(v);
-  try
-  {
-    v.at(0);
-    return false;
-  } catch(const std::out_of_range&)
-  {
-    return yav == copyV;
-  }
-}
+// bool testMoveOperatorforEmpty()
+// {
+//   topit::Vector< int > v;
+//   topit::Vector< int > copyV(v);
+//   topit::Vector< int > yav;
+//   yav = std::move(v);
+//   try
+//   {
+//     v.at(0);
+//     return false;
+//   } catch(const std::out_of_range&)
+//   {
+//     return yav == copyV;
+//   }
+// }
 
-bool testMoveOperatorforNonEmpty()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  topit::Vector< int > copyV(v);
-  topit::Vector< int > yav;
-  yav = std::move(v);
-  try
-  {
-    v.at(0);
-    return false;
-  } catch(const std::out_of_range&)
-  {
-    return yav == copyV;
-  }
-}
+// bool testMoveOperatorforNonEmpty()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   topit::Vector< int > copyV(v);
+//   topit::Vector< int > yav;
+//   yav = std::move(v);
+//   try
+//   {
+//     v.at(0);
+//     return false;
+//   } catch(const std::out_of_range&)
+//   {
+//     return yav == copyV;
+//   }
+// }
 
-bool testBegin()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
+// bool testBegin()
+// {
+//   topit::Vector< int > v({1, 2});
+//   topit::VecIter< int > it = v.begin();
+//   return *(it) == 1;
+// }
 
-  topit::VecIter< int > it = v.begin();
-  return *(it) == 1;
-}
+// bool testConstBegin()
+// {
+//   topit::Vector< int > v({1, 2});
+//   topit::VecConstIter< int > it = v.cbegin();
+//   return *(it) == 1;
+// }
 
-bool testConstBegin()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
+// bool testEnd()
+// {
+//   topit::Vector< int > v({1, 2});
+//   topit::VecIter< int > it = --v.end();
+//   return *(it) == 2;
+// }
 
-  topit::VecConstIter< int > it = v.cbegin();
-  return *(it) == 1;
-}
+// bool testConstEnd()
+// {
+//   topit::Vector< int > v({1, 2});
+//   topit::VecConstIter< int > it = --v.cend();
+//   return *(it) == 2;
+// }
 
-bool testEnd()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
+// bool testInsertElementIntoEmpty()
+// {
+//   topit::Vector< int > v;
+//   v.insert(0, 4);
+//   return v.getSize() == 1 && (v[0] == 4);
+// }
 
-  topit::VecIter< int > it = --v.end();
-  return *(it) == 3;
-}
+// bool testInsertElementIntoEmptyOutOfRange()
+// {
+//   topit::Vector< int > v;
+//   try
+//   {
+//     v.insert(1, 4);
+//     return false;
+//   }
+//   catch(const std::out_of_range&)
+//   {
+//     return true;
+//   }
+// }
 
-bool testConstEnd()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
+// bool testInsertIntoEmpty()
+// {
+//   topit::Vector< int > v({1, 2, 3});
+//   v.insert(1, 4);
+//   return v.getSize() == 4 && (v[0] == 1) && (v[1] == 4) && (v[2] == 2) && (v[3] == 3);
+// }
 
-  topit::VecConstIter< int > it = --v.cend();
-  return *(it) == 3;
-}
+// bool testInsertElementIntoNonEmpty()
+// {
+//   topit::Vector< int > v({1, 2, 3});
+//   try
+//   {
+//     v.insert(5, 4);
+//     return false;
+//   }
+//   catch(const std::out_of_range&)
+//   {
+//     return true;
+//   }
+// }
 
-bool testInsertElementIntoEmptyVector()
-{
-  topit::Vector< int > v;
-  try
-  {
-    v.insert(3, 4);
-    return false;
-  }
-  catch(const std::out_of_range& e)
-  {
-    return true;
-  }
-}
 
-bool testInsertElementIntoNonEmptyVector()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
-  v.insert(1, 4);
-  return v[0] == 1 && v[1] == 4 && v[2] == 2 && v[3] == 3;
-}
+// bool testInsertFewElementsIntoEmptyVector()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   v.pushBack(3);
 
-bool testInsertFewElementsIntoEmptyVector()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
+//   topit::Vector< int > yav;
+//   yav.insert(v, 0, 3, 0);
 
-  topit::Vector< int > yav;
-  yav.insert(v, 0, 3, 0);
+//   return yav[0] == 1 && yav[1] == 2 && yav[2] == 3;
+// }
 
-  return yav[0] == 1 && yav[1] == 2 && yav[2] == 3;
-}
+// bool testInsertFewElementsIntoNonEmptyVector()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(2);
+//   v.pushBack(3);
+//   v.pushBack(4);
 
-bool testInsertFewElementsIntoNonEmptyVector()
-{
-  topit::Vector< int > v;
-  v.pushBack(2);
-  v.pushBack(3);
-  v.pushBack(4);
+//   topit::Vector< int > yav;
+//   yav.pushBack(1);
+//   yav.pushBack(5);
+//   yav.pushBack(6);
 
-  topit::Vector< int > yav;
-  yav.pushBack(1);
-  yav.pushBack(5);
-  yav.pushBack(6);
+//   yav.insert(v, 0, 3, 1);
 
-  yav.insert(v, 0, 3, 1);
+//   return yav[0] == 1 && yav[1] == 2 && yav[2] == 3 && yav[3] == 4 && yav[4] == 5 && yav[5] == 6;
+// }
 
-  return yav[0] == 1 && yav[1] == 2 && yav[2] == 3 && yav[3] == 4 && yav[4] == 5 && yav[5] == 6;
-}
+// bool testInsertElementWithIterator()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   v.pushBack(3);
 
-bool testInsertElementWithIterator()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
+//   topit::VecIter< int > it = v.begin();
+//   v.insert(it, 4);
+//   return v[0] == 4;
+// }
 
-  topit::VecIter< int > it = v.begin();
-  v.insert(it, 4);
-  return v[0] == 4;
-}
+// bool testInsertSameElementsWithIterator()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   v.pushBack(3);
 
-bool testInsertSameElementsWithIterator()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
+//   topit::VecIter< int > it = v.begin();
+//   v.insert(it, 3, 4);
+//   return v[0] == 4 && v[1] == 4 && v[2] == 4 && v[3] == 1 && v[4] == 2 && v[5] == 3;
+// }
 
-  topit::VecIter< int > it = v.begin();
-  v.insert(it, 3, 4);
-  return v[0] == 4 && v[1] == 4 && v[2] == 4 && v[3] == 1 && v[4] == 2 && v[5] == 3;
-}
+// bool testInsertElementsFromAnotherVecWithIterator()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(4);
+//   v.pushBack(5);
+//   v.pushBack(6);
 
-bool testInsertElementsFromAnotherVecWithIterator()
-{
-  topit::Vector< int > v;
-  v.pushBack(4);
-  v.pushBack(5);
-  v.pushBack(6);
+//   topit::Vector< int > yav;
+//   yav.pushBack(1);
+//   yav.pushBack(2);
+//   yav.pushBack(3);
 
-  topit::Vector< int > yav;
-  yav.pushBack(1);
-  yav.pushBack(2);
-  yav.pushBack(3);
+//   topit::VecIter< int > it = v.begin();
+//   v.insert(it, yav.begin(), 3);
+//   return v[0] == 1 && v[1] == 2 && v[2] == 3;
+// }
 
-  topit::VecIter< int > it = v.begin();
-  v.insert(it, yav.begin(), 3);
-  return v[0] == 1 && v[1] == 2 && v[2] == 3;
-}
+// bool testEraseElementInEmpyVector()
+// {
+//   topit::Vector< int > v;
+//   try
+//   {
+//     v.erase(0);
+//     return false;
+//   }
+//   catch(const std::out_of_range&)
+//   {
+//     return true;
+//   }
+// }
 
-bool testEraseElementInEmpyVector()
-{
-  topit::Vector< int > v;
-  try
-  {
-    v.erase(0);
-    return false;
-  }
-  catch(const std::out_of_range&)
-  {
-    return true;
-  }
-}
+// bool testEraseElementInNonEmpyVector()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   v.pushBack(3);
+//   v.erase(0);
+//   v.erase(1);
+//   return v[0] == 2;
+// }
 
-bool testEraseElementInNonEmpyVector()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
-  v.erase(0);
-  v.erase(1);
-  return v[0] == 2;
-}
+// bool testEraseFewElementsInEmpyVector()
+// {
 
-bool testEraseFewElementsInEmpyVector()
-{
+//   topit::Vector< int > v;
+//   try
+//   {
+//     v.erase(0, 4);
+//     return false;
+//   }
+//   catch(const std::out_of_range&)
+//   {
+//     return true;
+//   }
+// }
 
-  topit::Vector< int > v;
-  try
-  {
-    v.erase(0, 4);
-    return false;
-  }
-  catch(const std::out_of_range&)
-  {
-    return true;
-  }
-}
+// bool testEraseFewElementsInNonEmpyVector()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   v.pushBack(3);
+//   v.pushBack(4);
+//   v.pushBack(5);
+//   v.erase(1, 3);
+//   bool res = v[0] == 1 && v[1] == 4 && v[2] == 5;
+//   v.erase(0, 2);
+//   return res && v[0] == 5;
+// }
 
-bool testEraseFewElementsInNonEmpyVector()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
-  v.pushBack(4);
-  v.pushBack(5);
-  v.erase(1, 3);
-  bool res = v[0] == 1 && v[1] == 4 && v[2] == 5;
-  v.erase(0, 2);
-  return res && v[0] == 5;
-}
-
-bool testEraseElementWithIterator()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
-  v.erase(v.begin());
-  return v[0] == 2 && v[1] == 3;
-}
+// bool testEraseElementWithIterator()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   v.pushBack(3);
+//   v.erase(v.begin());
+//   return v[0] == 2 && v[1] == 3;
+// }
 
 
 // bool testEraseFewElementsWithIterator()
@@ -458,28 +480,42 @@ bool testEraseElementWithIterator()
 //   return v[0] == 4 && v[1] == 5 && v[2] == 6;
 // }
 
-bool testEraseRangeOfElementsWithIterator()
-{
-  topit::Vector< int > v;
-  v.pushBack(1);
-  v.pushBack(2);
-  v.pushBack(3);
-  v.pushBack(4);
-  v.pushBack(5);
-  v.pushBack(6);
+// bool testEraseRangeOfElementsWithIterator()
+// {
+//   topit::Vector< int > v;
+//   v.pushBack(1);
+//   v.pushBack(2);
+//   v.pushBack(3);
+//   v.pushBack(4);
+//   v.pushBack(5);
+//   v.pushBack(6);
 
-  topit::VecIter< int > itS = v.begin();
-  topit::VecIter< int > itE = ++(++(++v.begin()));
-  v.erase(itS, itE);
-  return v[0] == 3 && v[1] == 4 && v[2] == 5;
-}
+//   topit::VecIter< int > itS = v.begin();
+//   topit::VecIter< int > itE = v.begin() + 2;
+//   v.erase(itS, itE);
+//   return v[0] == 3 && v[1] == 4 && v[2] == 5;
+// }
 
-bool testShrimpToFit()
-{
-  topit::Vector< int > v({1, 2 , 3, 4});
-  v.shrimpToFit();
-  return v.getSize() == 4 && v.getCapacity() == 4;
-}
+// bool testShrimpToFit()
+// {
+//   topit::Vector< int > v({1, 2, 3, 4});
+//   v.shrimpToFit();
+//   return v.getSize() == 4 && v.getCapacity() == 4;
+// }
+
+// bool testReserveInEmpty()
+// {
+//   topit::Vector< int > v;
+//   v.reserve(4);
+//   return v.getCapacity() == 4;
+// }
+
+// bool testReserveInNonEmpty()
+// {
+//   topit::Vector< int > v({1, 2, 3});
+//   v.reserve(4);
+//   return v.getCapacity() == 4 && (v[0] == 1) && (v[1] == 2) && (v[2] == 3);
+// }
 
 
 int main()
@@ -489,14 +525,22 @@ int main()
     { "Empty vector", testEmptyVector },
     { "Size of vector", testSizeOfVector },
     { "Capacity of vector", testCapacityOfVector },
+    { "Shrimp to fit", testShrimpToFit},
+    { "Reserve in empty vector", testReserveInEmpty},
+    { "Reserve in non empty vector", testReserveInNonEmpty},
+
     { "Push value to the back", testPushBack },
     { "Push back few same elements", testPushBackCount},
-    { "Push back few elements with iterator", testPushBackRange},
-    { "Pop value from back", testPopBack },
+    { "Push back few elements from the begining of another vector", testPushBackWithBeginRange},
+    { "Push back few elements from the middle of another vector", testPushBackWithMiddleRange},
+    { "Pop value from the back of empty vector", testPopBackEmpty },
+    { "Pop value from the back of non empty vector", testPopBackNonEmpty },
+
     { "Inbound access", testElementInboundAccess },
     { "Out of bound access", testElementOutOfBoundAccess },
     { "Inbound const access", testElementInboundConstAccess },
     { "Out of bound const access", testElementOutOfBoundConstAccess },
+
     { "Copy constructor for empty vector", testCopyConstructorforEmpty },
     { "Copy constructor for non empty vector", testCopyConstructorforNonEmpty },
     { "Copy operator for empty vector", testCopyOperatorforEmpty },
@@ -505,13 +549,17 @@ int main()
     { "Move constructor for non empty vector", testMoveConstructorforNonEmpty },
     { "Move operator for empty vector", testMoveOperatorforEmpty },
     { "Move operator for non empty vector", testMoveOperatorforNonEmpty },
-    { "Non-empty vector for non-empty initializer list", testInitializerList},
+
+    { "Non-empty vector for non-empty initializer list", testNonEmptyInitializerList},
+    { "Empty vector for empty initializer list", testEmptyInitializerList},
+
     { "Begin of the vector", testBegin},
     { "Const begin of the vector", testConstBegin},
     { "End of the vector", testEnd},
     { "Const end of the vector", testConstEnd},
-    { "Insert element into empty vector", testInsertElementIntoEmptyVector},
-    { "Insert element into non empty vector", testInsertElementIntoNonEmptyVector},
+    { "Insert element into empty vector with inbound access", testInsertElementIntoNonEmpty},
+    { "Insert element into empty vector with out of bound access", testInsertElementIntoEmpty},
+    { "Insert element into non empty vector", testInsertFewElementsIntoNonEmptyVector},
     { "Insert few elements into empty vector", testInsertFewElementsIntoEmptyVector},
     { "Insert few elements into non empty vector", testInsertFewElementsIntoNonEmptyVector},
     { "Insert element with iterator", testInsertElementWithIterator},
@@ -522,9 +570,8 @@ int main()
     { "Erase few elements in empty vector", testEraseFewElementsInEmpyVector},
     { "Erase few elements in non empty vector", testEraseFewElementsInNonEmpyVector},
     { "Erase element with iterator", testEraseElementWithIterator},
-    // { "Erase few elements with iterator", testEraseFewElementsWithIterator},
+    { "Erase few elements with iterator", testEraseFewElementsWithIterator},
     { "Erase range of elements with iterator", testEraseRangeOfElementsWithIterator},
-    { "Shrimp to fit", testShrimpToFit},
   };
   std::cout << "TESTS\n";
   const size_t count = sizeof(tests) / sizeof(test_t);

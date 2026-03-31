@@ -11,12 +11,12 @@ namespace topit
     VecIter(T* ptr);
     VecIter< T >& operator++();
     VecIter< T > operator++(int);
-    VecIter< T >& operator+(size_t) const noexcept;
+    VecIter< T > operator+(size_t) const noexcept;
 
 
     VecIter< T >& operator--();
     VecIter< T > operator--(int);
-    VecIter< T >& operator-(size_t) const noexcept;
+    VecIter< T > operator-(size_t) const noexcept;
 
     std::ptrdiff_t operator-(VecIter< T > other) const;
 
@@ -61,9 +61,9 @@ topit::VecIter< T > topit::VecIter< T >::operator++(int)
 }
 
 template< class T >
-topit::VecIter< T >& topit::VecIter< T >::operator+(size_t n) const noexcept
+topit::VecIter< T > topit::VecIter< T >::operator+(size_t n) const noexcept
 {
-  return {ptr_ + n};
+  return VecIter< T >{ptr_ + n};
 }
 
 
@@ -82,10 +82,10 @@ topit::VecIter< T > topit::VecIter< T >::operator--(int)
   return tmp;
 }
 
-template< class T >
-topit::VecIter< T >& topit::VecIter< T >::operator-(size_t n) const noexcept
+template<class T>
+topit::VecIter<T> topit::VecIter<T>::operator-(size_t n) const noexcept
 {
-  return {ptr_ - n};
+  return VecIter<T>{ptr_ - n};
 }
 
 template< class T >

@@ -30,12 +30,8 @@ namespace topit
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
-    //Классная работа 30.03.26
     void reserve(size_t newCapacity);
     void shrimpToFit();
-    void pushBackCount(size_t numberOfElements, const T& value);
-    template< class IT >
-    void pushBackRange(IT beginIterator, size_t numberOfElements);
 
     VecIter< T > begin() const;
     VecConstIter< T > cbegin() const;
@@ -43,14 +39,17 @@ namespace topit
     VecConstIter< T > cend() const;
 
     void pushBack(const T& v);
+    void pushBackCount(size_t numberOfElements, const T& value);
+    template< class IT >
+    void pushBackRange(IT beginIterator, size_t numberOfElements);
 
-    void popBack();
     void insert(size_t position, const T& value);
     void insert(VecIter< T > position, const T& value);
     void insert(VecIter< T > position, size_t numberOfElements, const T& value);
     void insert(VecIter< T > position, VecIter< T > beginIterator, size_t numberOfElements);
+    void insert(size_t position, const Vector< T >& anotherVector, size_t start, size_t end);
 
-    void insert(const Vector< T >& another, size_t start, size_t end, size_t pos);
+    void popBack();
     void erase(size_t position);
     void erase(size_t start, size_t end);
     void erase(VecIter< T > pos);
@@ -262,7 +261,7 @@ void topit::Vector< T >::reserve(size_t newCapacity)
     {
       newData[j].~T();
     }
-    ::operator delete (data_);
+    ::operator delete (newData);
     throw;
   }
   destroy();
@@ -277,8 +276,6 @@ void topit::Vector< T >::shrimpToFit()
 {
   reserve(size_);
 }
-
-
 
 template< class T >
 void topit::Vector< T >::pushBack(const T& value)
@@ -297,12 +294,12 @@ void topit::Vector< T >::pushBack(const T& value)
 
 template< class T >
 template< class IT >
-void topit::Vector< T >::pushBackRange(IT beginIterator, size_t numberOfElements) // Не (IT e) потому что заставляет писать плохой код
+void topit::Vector< T >::pushBackRange(IT beginIterator, size_t numberOfElements)
 {
   if (size_ + numberOfElements >= capacity_)
   {
     Vector< T > temp(*this);
-    temp.reserve(temp.capacity_ == 0 ? numberOfElements : temp.size_ + numberOfElements);
+    temp.reserve(std::max(size_ + numberOfElements, temp.capacity_ == 0 ? 8 : capacity_ * 2));
     for (size_t i = 0; i < numberOfElements; ++i)
     {
       temp.unsafePushBack(*beginIterator);
@@ -326,9 +323,9 @@ void topit::Vector< T >::pushBackCount(size_t numberOfElements, const T& value)
   if (size_ + numberOfElements >= capacity_)
   {
     Vector< T > temp(*this);
-    size_t new_size = temp.size_ + numberOfElements;
+    size_t newSize = temp.size_ + numberOfElements;
 
-    temp.reserve(std::max(new_size, temp.capacity_ == 0 ? 8 : temp.capacity_ * 2));
+    temp.reserve(std::max(newSize, temp.capacity_ == 0 ? 8 : temp.capacity_ * 2));
     for (size_t i = 0; i < numberOfElements; ++i)
     {
       temp.unsafePushBack(value);
@@ -344,7 +341,7 @@ void topit::Vector< T >::pushBackCount(size_t numberOfElements, const T& value)
 }
 
 template< class T >
-void topit::Vector< T >::unsafePushBack(const T& value) // Без проверки. Вызывается во всех остальных push back
+void topit::Vector< T >::unsafePushBack(const T& value)
 {
   assert(size_ < capacity_);
   new (data_ + size_) T(value);
@@ -372,16 +369,17 @@ void topit::Vector< T >::insert(VecIter< T > position, const T& value)
 template< class T >
 void topit::Vector< T >::insert(VecIter< T > position, size_t numberOfElements, const T& value)
 {
-  if (position < begin() || position > end()) {
-    throw std::out_of_range("insert: iterator out of range");
+  if (position < begin() || position > end())
+  {
+    throw std::out_of_range("Insert: Iterator is out of range");
   }
 
   Vector< T > temp(*this);
   size_t startPosition = position - begin();
-  size_t new_size = temp.size_ + numberOfElements;
+  size_t newSize = temp.size_ + numberOfElements;
   if (temp.size_ + numberOfElements >= temp.capacity_)
   {
-    temp.reserve(std::max(new_size, temp.capacity_ == 0 ? 8 : temp.capacity_ * 2));
+    temp.reserve(std::max(newSize, temp.capacity_ == 0 ? 8 : temp.capacity_ * 2));
   }
   for (size_t i = temp.size_; i > startPosition; --i)
   {
@@ -399,16 +397,17 @@ void topit::Vector< T >::insert(VecIter< T > position, size_t numberOfElements, 
 template< class T >
 void topit::Vector< T >::insert(VecIter< T > position, VecIter< T > startIterator, size_t numberOfElements)
 {
-  if (position < begin() || position > end()) {
-    throw std::out_of_range("insert: iterator out of range");
+  if (position < begin() || position > end())
+  {
+    throw std::out_of_range("Insert: Iterator is out of range");
   }
 
   Vector< T > temp(*this);
   size_t startPosition = position - begin();
-  size_t new_size = temp.size_ + numberOfElements;
+  size_t newSize = temp.size_ + numberOfElements;
   if (temp.size_ + numberOfElements >= temp.capacity_)
   {
-    temp.reserve(std::max(new_size, temp.capacity_ == 0 ? 8 : temp.capacity_ * 2));
+    temp.reserve(std::max(newSize, temp.capacity_ == 0 ? 8 : temp.capacity_ * 2));
   }
   for (size_t i = temp.size_; i > startPosition; --i)
   {
@@ -426,8 +425,9 @@ void topit::Vector< T >::insert(VecIter< T > position, VecIter< T > startIterato
 template< class T >
 void topit::Vector< T >::insert(size_t position, const T& value)
 {
-  if (position > size_) {
-    throw std::out_of_range("insert: position > size");
+  if (position >= size_)
+  {
+    throw std::out_of_range("Insert: Position is out of range");
   }
 
   Vector< T > temp(*this);
@@ -446,35 +446,38 @@ void topit::Vector< T >::insert(size_t position, const T& value)
 }
 
 template< class T >
-void topit::Vector< T >::insert(const Vector< T >& anotherVector, size_t start, size_t end, size_t position)
+void topit::Vector< T >::insert(size_t position, const Vector< T >& anotherVector, size_t start, size_t end)
 {
   if (start > end)
   {
-    throw std::invalid_argument("insert: start > end");
+    throw std::invalid_argument("Insert: start position must be less than end position");
   }
   if (end > anotherVector.size_)
   {
-    throw std::out_of_range("insert: end > another.size");
+    throw std::out_of_range("Insert: end position is out of range");
   }
   if (position > size_)
   {
-    throw std::out_of_range("insert: position > this->size");
+    throw std::out_of_range("Insert: Position is out of range");
   }
 
-  Vector< T > temp(*this);
   size_t numberOfElements = end - start;
   if (numberOfElements == 0)
   {
     return;
   }
-  size_t new_size = temp.size_ + numberOfElements;
+
+  Vector< T > temp(*this);
+
+  size_t newSize = temp.size_ + numberOfElements;
   if (temp.size_ + numberOfElements >= temp.capacity_)
   {
-    temp.reserve(std::max(new_size, temp.capacity_ == 0 ? 8 : temp.capacity_ * 2));
+    temp.reserve(std::max(newSize, temp.capacity_ == 0 ? 8 : temp.capacity_ * 2));
   }
   for (size_t i = temp.size_; i > position; --i)
   {
     new (temp.data_ + i + numberOfElements - 1) T(std::move(temp.data_[i - 1]));
+    temp.data_[i - 1].~T();
   }
   for (size_t i = start; i < end; ++i)
   {
@@ -487,8 +490,9 @@ void topit::Vector< T >::insert(const Vector< T >& anotherVector, size_t start, 
 template< class T >
 void topit::Vector< T >::erase(size_t position)
 {
-  if (position >= size_) {
-    throw std::out_of_range("erase: position >= size");
+  if (position >= size_)
+  {
+    throw std::out_of_range("Erase: Position is out of range");
   }
 
   Vector< T > temp(*this);
@@ -496,6 +500,7 @@ void topit::Vector< T >::erase(size_t position)
   {
     temp.data_[i] = std::move(temp.data_[i + 1]);
   }
+  data_[size_ - 1].~T();
   --temp.size_;
   swap(temp);
 }
@@ -505,11 +510,11 @@ void topit::Vector< T >::erase(size_t start, size_t end)
 {
   if (start > end)
   {
-    throw std::invalid_argument("erase: start > end");
+    throw std::invalid_argument("Erase: start position must be less than end position");
   }
   if (end > size_)
   {
-    throw std::out_of_range("erase: end > another.size");
+    throw std::out_of_range("Erase: end position is out of range");
   }
 
   size_t numberOfElements = end - start;
@@ -518,9 +523,16 @@ void topit::Vector< T >::erase(size_t start, size_t end)
     return;
   }
   Vector<T> temp(*this);
-  for (size_t i = end; i < temp.size_; ++i) {
+  for (size_t i = end; i < temp.size_; ++i)
+  {
     temp.data_[i - numberOfElements] = std::move(temp.data_[i]);
   }
+
+  for (size_t i = temp.size_ - numberOfElements; i < temp.size_; ++i)
+  {
+    temp.data_[i].~T();
+  }
+
   temp.size_ -= numberOfElements;
   swap(temp);
 }
@@ -534,24 +546,28 @@ void topit::Vector< T >::erase(VecIter< T > position)
 
 
 template< class T >
-void topit::Vector< T >::erase(VecIter< T > pos, size_t s)
+void topit::Vector< T >::erase(VecIter< T > position, size_t s)
 {
-
+  size_t pos = position - begin();
+  erase(pos, pos + s);
 }
 
-// template< class T >
-// void topit::Vector< T >::erase(VecIter< T > beginIterator, VecIter< T > endIterator)
-// {
-//   if (beginIterator < begin() || endIterator > end() || beginIterator > endIterator)
-//   {
-//     throw std::out_of_range("erase: invalid range");
-//   }
+template< class T >
+void topit::Vector< T >::erase(VecIter< T > beginIterator, VecIter< T > endIterator)
+{
+  if (beginIterator > endIterator)
+  {
+    throw std::invalid_argument("Erase: beginIterator must be less than endIterator");
+  } else if (beginIterator < begin() || endIterator > end())
+  {
+    throw std::out_of_range("Erase: Iterator is out of range");
+  }
 
-//   size_t b = beginIterator - begin();
-//   size_t e = endIterator - begin();
-//   size_t count = e - b;
-//   erase(b, b + count);
-// }
+  size_t b = beginIterator - begin();
+  size_t e = endIterator - begin();
+  size_t count = e - b;
+  erase(b, b + count);
+}
 
 
 template< class T >
