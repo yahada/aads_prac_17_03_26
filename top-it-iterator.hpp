@@ -18,7 +18,7 @@ namespace topit
     VecIter< T > operator--(int);
     VecIter< T > operator-(size_t) const noexcept;
 
-    std::ptrdiff_t operator-(VecIter< T > other) const;
+    std::ptrdiff_t operator-(const VecIter< T >& other) const;
 
     bool operator==(const VecIter& other) const noexcept;
     bool operator!=(const VecIter& other) const noexcept;
@@ -89,7 +89,7 @@ topit::VecIter<T> topit::VecIter<T>::operator-(size_t n) const noexcept
 }
 
 template< class T >
-std::ptrdiff_t topit::VecIter< T >::operator-(VecIter< T > other) const
+std::ptrdiff_t topit::VecIter< T >::operator-(const VecIter< T >& other) const
 {
   return ptr_ - other.ptr_;
 }
@@ -98,6 +98,7 @@ std::ptrdiff_t topit::VecIter< T >::operator-(VecIter< T > other) const
 template< class T >
 T& topit::VecIter< T >::operator*()
 {
+  assert(ptr_ != nullptr);
   return *ptr_;
 }
 

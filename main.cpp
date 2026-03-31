@@ -483,7 +483,7 @@ bool testEraseElementWithIteratorInNonEmpty()
 
 bool testEraseElementWithIteratorInEmpty()
 {
-  topit::Vector< int > v({1, 2, 3});
+  topit::Vector< int > v;
   try
   {
     v.erase(v.begin());
@@ -603,7 +603,7 @@ int main()
     { "Erase few elements in non empty vector", testEraseFewElementsInNonEmpty },
     { "Erase few elements in non empty vector with wrong range", testEraseFewElementsOutOfRangeInNonEmpty },
     { "Erase element with iterator in non empty", testEraseElementWithIteratorInNonEmpty },
-    { "Erase element with iterator in empty", testEraseElementWithIteratorInNonEmpty },
+    { "Erase element with iterator in empty", testEraseElementWithIteratorInEmpty },
     { "Erase few elements with iterator", testEraseFewElementsWithIterator },
     { "Erase few elements with iterator out of range", testEraseFewElementsWithIteratorOutOfRange },
     { "Erase range of elements with iterator", testEraseRangeOfElementsWithIterator },

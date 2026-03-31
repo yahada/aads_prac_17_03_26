@@ -111,6 +111,7 @@ topit::Vector< T >::Vector(Vector< T >&& rhs) noexcept:
 {
   rhs.data_ = nullptr;
   rhs.size_ = 0;
+  rhs.capacity_ = 0;
 }
 
 template< class T >
@@ -503,7 +504,7 @@ void topit::Vector< T >::erase(size_t position)
   {
     temp.data_[i] = std::move(temp.data_[i + 1]);
   }
-  data_[size_ - 1].~T();
+  temp.data_[temp.size_ - 1].~T();
   --temp.size_;
   swap(temp);
 }
@@ -514,8 +515,7 @@ void topit::Vector< T >::erase(size_t start, size_t end)
   if (start > end)
   {
     throw std::invalid_argument("Erase: start position must be less than end position");
-  }
-  if (end > size_)
+  } else if (end > size_)
   {
     throw std::out_of_range("Erase: end position is out of range");
   }

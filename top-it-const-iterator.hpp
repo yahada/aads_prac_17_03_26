@@ -18,7 +18,7 @@ namespace topit
     VecConstIter< T > operator--(int);
     VecConstIter< T > operator-(size_t) const noexcept;
 
-    std::ptrdiff_t operator-(VecConstIter< T > other) const;
+    std::ptrdiff_t operator-(const VecConstIter& other) const;
 
     bool operator==(const VecConstIter& other) const noexcept;
     bool operator!=(const VecConstIter& other) const noexcept;
@@ -27,8 +27,8 @@ namespace topit
     bool operator<=(const VecConstIter& other) const noexcept;
     bool operator>=(const VecConstIter& other) const noexcept;
 
-    const T& operator*();
-    const T* operator->();
+    const T& operator*() const;
+    const T* operator->() const;
   private:
     const T* ptr_;
   };
@@ -89,20 +89,20 @@ topit::VecConstIter< T > topit::VecConstIter< T >::operator-(size_t n) const noe
 }
 
 template< class T >
-std::ptrdiff_t topit::VecConstIter< T >::operator-(VecConstIter< T > other) const
+std::ptrdiff_t topit::VecConstIter< T >::operator-(const VecConstIter< T >& other) const
 {
   return ptr_ - other.ptr_;
 }
 
 
 template< class T >
-const T& topit::VecConstIter< T >::operator*()
+const T& topit::VecConstIter< T >::operator*() const
 {
   return *ptr_;
 }
 
 template< class T >
-const T* topit::VecConstIter< T >::operator->()
+const T* topit::VecConstIter< T >::operator->() const
 {
   return std::addressof(ptr_);
 }
