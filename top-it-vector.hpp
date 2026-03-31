@@ -44,9 +44,9 @@ namespace topit
     void pushBackRange(IT beginIterator, size_t numberOfElements);
 
     void insert(size_t position, const T& value);
-    void insert(VecIter< T > position, const T& value);
-    void insert(VecIter< T > position, size_t numberOfElements, const T& value);
-    void insert(VecIter< T > position, VecIter< T > beginIterator, size_t numberOfElements);
+    VecIter< T > insert(VecIter< T > position, const T& value);
+    VecIter< T > insert(VecIter< T > position, size_t numberOfElements, const T& value);
+    VecIter< T > insert(VecIter< T > position, VecIter< T > beginIterator, size_t numberOfElements);
     void insert(size_t position, const Vector< T >& anotherVector, size_t start, size_t end);
 
     void popBack();
@@ -360,14 +360,15 @@ void topit::Vector< T >::popBack()
 }
 
 template< class T >
-void topit::Vector< T >::insert(VecIter< T > position, const T& value)
+topit::VecIter< T > topit::Vector< T >::insert(VecIter< T > position, const T& value)
 {
   size_t pos = position - begin();
   insert(pos, value);
+  return position + 1;
 }
 
 template< class T >
-void topit::Vector< T >::insert(VecIter< T > position, size_t numberOfElements, const T& value)
+topit::VecIter< T > topit::Vector< T >::insert(VecIter< T > position, size_t numberOfElements, const T& value)
 {
   if (position < begin() || position > end())
   {
@@ -392,10 +393,11 @@ void topit::Vector< T >::insert(VecIter< T > position, size_t numberOfElements, 
   }
   temp.size_ += numberOfElements;
   swap(temp);
+  return position + numberOfElements;
 }
 
 template< class T >
-void topit::Vector< T >::insert(VecIter< T > position, VecIter< T > startIterator, size_t numberOfElements)
+topit::VecIter< T > topit::Vector< T >::insert(VecIter< T > position, VecIter< T > startIterator, size_t numberOfElements)
 {
   if (position < begin() || position > end())
   {
@@ -420,12 +422,13 @@ void topit::Vector< T >::insert(VecIter< T > position, VecIter< T > startIterato
   }
   temp.size_ += numberOfElements;
   swap(temp);
+  return position + numberOfElements;
 }
 
 template< class T >
 void topit::Vector< T >::insert(size_t position, const T& value)
 {
-  if (position >= size_)
+  if (position > size_)
   {
     throw std::out_of_range("Insert: Position is out of range");
   }
