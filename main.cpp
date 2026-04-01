@@ -199,6 +199,12 @@ bool testMoveConstructorforNonEmpty()
   }
 }
 
+bool testConstructorWithSizeAndInit()
+{
+  topit::Vector< int > v(3, 8);
+  return v.getSize() == 3 && (v[0] == 8 && v[1] == 8 && v[2] == 8);
+}
+
 bool testCopyOperatorforEmpty()
 {
   topit::Vector< int > v;
@@ -571,6 +577,7 @@ int main()
     { "Copy constructor for non empty vector", testCopyConstructorforNonEmpty },
     { "Move constructor for empty vector", testMoveConstructorforEmpty },
     { "Move constructor for non empty vector", testMoveConstructorforNonEmpty },
+    { "Constructor with size and init values", testConstructorWithSizeAndInit},
     { "Copy operator for empty vector", testCopyOperatorforEmpty },
     { "Copy operator for non empty vector", testCopyOperatorforNonEmpty },
     { "Move operator for empty vector", testMoveOperatorforEmpty },
